@@ -7,6 +7,9 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -81,6 +84,10 @@ public class NumberPicker extends android.widget.NumberPicker {
         }
     }
 
+    public void setDividerColorResource(@ColorRes int colorId) {
+        setDividerColor(getResources().getColor(colorId));
+    }
+
     public void setFormatter(String formatter) {
         if (TextUtils.isEmpty(formatter)) {
             return;
@@ -94,6 +101,10 @@ public class NumberPicker extends android.widget.NumberPicker {
         });
     }
 
+    public void setFormatter(@StringRes int stringId) {
+        setFormatter(getResources().getString(stringId));
+    }
+
     public void setFocusable(boolean focusable) {
         mFocusable = focusable;
         setTextAttributes();
@@ -104,14 +115,41 @@ public class NumberPicker extends android.widget.NumberPicker {
         setTextAttributes();
     }
 
+    public void setTextColorResource(@ColorRes int colorId) {
+        setTextColor(getResources().getColor(colorId));
+    }
+
     public void setTextSize(float textSize) {
         mTextSize = textSize;
         setTextAttributes();
     }
 
+    public void setTextSize(@DimenRes int dimenId) {
+        setTextSize(getResources().getDimension(dimenId));
+    }
+
     public void setTypeface(Typeface typeface) {
         mTypeface = typeface;
         setTextAttributes();
+    }
+
+    public void setTypeface(String string, int style) {
+        if (TextUtils.isEmpty(string)) {
+            return;
+        }
+        setTypeface(Typeface.create(string, style));
+    }
+
+    public void setTypeface(String string) {
+        setTypeface(string, Typeface.NORMAL);
+    }
+
+    public void setTypeface(@StringRes int stringId, int style) {
+        setTypeface(getResources().getString(stringId), style);
+    }
+
+    public void setTypeface(@StringRes int stringId) {
+        setTypeface(stringId, Typeface.NORMAL);
     }
 
     private void setTextAttributes() {
@@ -146,7 +184,7 @@ public class NumberPicker extends android.widget.NumberPicker {
     }
 
     private float pxToSp(float px) {
-        return px / getContext().getResources().getDisplayMetrics().scaledDensity;
+        return px / getResources().getDisplayMetrics().scaledDensity;
     }
 
 }

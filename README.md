@@ -12,16 +12,29 @@ The android library that provides a simple and customizable NumberPicker.
 
 ```java
 NumberPicker numberPicker = (NumberPicker) findViewById(R.id.number_picker);
+
 // set divider color
 numberPicker.setDividerColor(getResources().getColor(R.color.colorPrimary));
+numberPicker.setDividerColorResource(R.color.colorPrimary);
+
 // set formatter
 numberPicker.setFormatter(getString(R.string.number_picker_formatter));
+numberPicker.setFormatter(R.string.number_picker_formatter);
+
 // set text color
 numberPicker.setTextColor(getResources().getColor(R.color.colorPrimary));
+numberPicker.setTextColorResource(R.color.colorPrimary);
+
 // set text size
 numberPicker.setTextSize(getResources().getDimension(R.dimen.text_size));
+numberPicker.setTextSize(R.dimen.text_size);
+
 // set typeface
 numberPicker.setTypeface(Typeface.create(getString(R.string.roboto_light), Typeface.NORMAL));
+numberPicker.setTypeface(getString(R.string.roboto_light), Typeface.NORMAL);
+numberPicker.setTypeface(getString(R.string.roboto_light));
+numberPicker.setTypeface(R.string.roboto_light, Typeface.NORMAL);
+numberPicker.setTypeface(R.string.roboto_light);
 ```
 
 #### XML
