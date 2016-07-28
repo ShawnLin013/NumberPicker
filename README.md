@@ -47,6 +47,8 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
+    app:np_width="64"
+    app:np_height="180"
     app:np_dividerColor="@color/colorPrimary"
     app:np_formatter="@string/number_picker_formatter"
     app:np_max="59"
@@ -67,6 +69,8 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_textColor|The text color of the numbers|
 |np_textSize|The text size of the numbers|
 |np_typeface|The typeface of the numbers|
+|np_width|The width of the number picker|
+|np_height|The height of the number picker|
 
 ## Gradle
 
@@ -80,7 +84,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.shawnlin:number-picker:1.0.0'
+    compile 'com.shawnlin:number-picker:1.0.1'
 }
 ```
 

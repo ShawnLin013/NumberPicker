@@ -20,11 +20,17 @@ import java.util.Locale;
 
 public class NumberPicker extends android.widget.NumberPicker {
 
+    private static final float DEFAULT_WIDTH = 64;
+
+    private static final float DEFAULT_HEIGHT = 180;
+
     private int mDividerColor;
 
     private String mFormatter;
 
     private boolean mFocusable = false;
+
+    private boolean mIsHorizontal = false;
 
     private int mMax = 100;
 
@@ -36,28 +42,72 @@ public class NumberPicker extends android.widget.NumberPicker {
 
     private Typeface mTypeface;
 
-    public NumberPicker(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.NumberPicker);
-        initAttributes(typedArray);
-        typedArray.recycle();
+    private float mWidth;
+
+    private float mHeight;
+
+    /**
+     * Create a new number picker.
+     *
+     * @param context The application environment.
+     */
+    public NumberPicker(Context context) {
+        this(context, null);
     }
 
-    private void initAttributes(TypedArray typedArray) {
-        mDividerColor = typedArray.getColor(R.styleable.NumberPicker_np_dividerColor, mDividerColor);
-        mFormatter = typedArray.getString(R.styleable.NumberPicker_np_formatter);
-        mFocusable = typedArray.getBoolean(R.styleable.NumberPicker_np_focusable, mFocusable);
-        mMax = typedArray.getInt(R.styleable.NumberPicker_np_max, mMax);
-        mMin = typedArray.getInt(R.styleable.NumberPicker_np_min, mMin);
-        mTextColor = typedArray.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
-        mTextSize = typedArray.getDimension(R.styleable.NumberPicker_np_textSize, mTextSize);
-        mTypeface = Typeface.create(typedArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
+    /**
+     * Create a new number picker.
+     *
+     * @param context The application environment.
+     * @param attrs A collection of attributes.
+     */
+    public NumberPicker(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
 
+    /**
+     * Create a new number picker
+     *
+     * @param context the application environment.
+     * @param attrs a collection of attributes.
+     * @param defStyle The default style to apply to this view.
+     */
+    public NumberPicker(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs);
+        TypedArray attributesArray = context.obtainStyledAttributes(attrs, R.styleable.NumberPicker, defStyle, 0);
+        mDividerColor = attributesArray.getColor(R.styleable.NumberPicker_np_dividerColor, mDividerColor);
+        mFormatter = attributesArray.getString(R.styleable.NumberPicker_np_formatter);
+        mFocusable = attributesArray.getBoolean(R.styleable.NumberPicker_np_focusable, mFocusable);
+        mIsHorizontal = attributesArray.getBoolean(R.styleable.NumberPicker_np_horizontal, mIsHorizontal);
+        mMax = attributesArray.getInt(R.styleable.NumberPicker_np_max, mMax);
+        mMin = attributesArray.getInt(R.styleable.NumberPicker_np_min, mMin);
+        mTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
+        mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, mTextSize);
+        mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
+        mWidth = attributesArray.getFloat(R.styleable.NumberPicker_np_width, 0);
+        mHeight = attributesArray.getFloat(R.styleable.NumberPicker_np_height, 0);
+        attributesArray.recycle();
+
+        if (mIsHorizontal) {
+            setOrientation(HORIZONTAL);
+        }
         setDividerColor(mDividerColor);
         setFormatter(mFormatter);
+        setRotation(mIsHorizontal ? 270 : 0);
         setMaxValue(mMax);
         setMinValue(mMin);
         setTextAttributes();
+
+        if (mWidth != 0 && mHeight != 0) {
+            setScaleX(mWidth / DEFAULT_WIDTH);
+            setScaleY(mHeight / DEFAULT_HEIGHT);
+        } else if (mWidth != 0) {
+            setScaleX(mWidth / DEFAULT_WIDTH);
+            setScaleY(mWidth / DEFAULT_WIDTH);
+        } else if (mHeight != 0) {
+            setScaleX(mHeight / DEFAULT_HEIGHT);
+            setScaleY(mHeight / DEFAULT_HEIGHT);
+        }
     }
 
     public void setDividerColor(@ColorInt int color) {
