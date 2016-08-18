@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="45dp"
-        app:np_width="50"
+        app:np_width="50dp"
         app:np_dividerColor="@color/colorPrimary"
         app:np_formatter="@string/number_picker_formatter"
         app:np_max="59"
