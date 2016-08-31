@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.shawnlin.numberpicker;
 
 import android.content.Context;
@@ -58,7 +42,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -68,31 +51,6 @@ import java.util.Locale;
 
 /**
  * A widget that enables the user to select a number form a predefined range.
- * There are two flavors of this widget and which one is presented to the user
- * depends on the current theme.
- * <ul>
- * <li>
- * If the current theme is derived from {@link android.R.style#Theme} the widget
- * presents the current value as an editable input field with an increment button
- * above and a decrement button below. Long pressing the buttons allows for a quick
- * change of the current value. Tapping on the input field allows to type in
- * a desired value.
- * </li>
- * <li>
- * If the current theme is derived from {@link android.R.style#Theme_Holo} or
- * {@link android.R.style#Theme_Holo_Light} the widget presents the current
- * value as an editable input field with a lesser value above and a greater
- * value below. Tapping on the lesser or greater value selects it by animating
- * the number axis up or down to make the chosen value current. Flinging up
- * or down allows for multiple increments or decrements of the current value.
- * Long pressing on the lesser and greater values also allows for a quick change
- * of the current value. Tapping on the current value allows to type in a
- * desired value.
- * </li>
- * </ul>
- * <p>
- * For an example of using this widget, see {@link android.widget.TimePicker}.
- * </p>
  */
 public class NumberPicker extends LinearLayout {
 
@@ -129,12 +87,12 @@ public class NumberPicker extends LinearLayout {
     /**
      * The strength of fading in the top and bottom while drawing the selector.
      */
-    private static final float TOP_AND_BOTTOM_FADING_EDGE_STRENGTH = 0.9f;
+    private static final float FADING_EDGE_STRENGTH = 0.9f;
 
     /**
      * The default unscaled height of the selection divider.
      */
-    private static final int UNSCALED_DEFAULT_SELECTION_DIVIDER_HEIGHT = 2;
+    private static final int UNSCALED_DEFAULT_SELECTION_DIVIDER_THICKNESS = 2;
 
     /**
      * The default unscaled distance between the selection dividers.
@@ -146,12 +104,24 @@ public class NumberPicker extends LinearLayout {
      */
     private static final int SIZE_UNSPECIFIED = -1;
 
+    /**
+     * The default max value of this widget.
+     */
     private static final int DEFAULT_MAX_VALUE = 100;
 
+    /**
+     * The default min value of this widget.
+     */
     private static final int DEFAULT_MIN_VALUE = 1;
 
+    /**
+     * The default max height of this widget.
+     */
     private static final int DEFAULT_MAX_HEIGHT = 180;
 
+    /**
+     * The default min width of this widget.
+     */
     private static final int DEFAULT_MIN_WIDTH = 64;
 
     /**
@@ -259,6 +229,11 @@ public class NumberPicker extends LinearLayout {
     private Typeface mTypeface;
 
     /**
+     * The width of the gap between text elements if the selector wheel.
+     */
+    private int mSelectorTextGapWidth;
+
+    /**
      * The height of the gap between text elements if the selector wheel.
      */
     private int mSelectorTextGapHeight;
@@ -319,9 +294,9 @@ public class NumberPicker extends LinearLayout {
     private final Paint mSelectorWheelPaint;
 
     /**
-     * The height of a selector element (text + gap).
+     * The size of a selector element (text + gap).
      */
-    private int mSelectorElementHeight;
+    private int mSelectorElementSize;
 
     /**
      * The initial offset of the scroll selector.
@@ -342,6 +317,11 @@ public class NumberPicker extends LinearLayout {
      * The {@link Scroller} responsible for adjusting the selector.
      */
     private final Scroller mAdjustScroller;
+
+    /**
+     * The previous X coordinate while scrolling the selector.
+     */
+    private int mPreviousScrollerX;
 
     /**
      * The previous Y coordinate while scrolling the selector.
@@ -365,14 +345,19 @@ public class NumberPicker extends LinearLayout {
     private BeginSoftInputOnLongPressCommand mBeginSoftInputOnLongPressCommand;
 
     /**
+     * The X position of the last down event.
+     */
+    private float mLastDownEventX;
+
+    /**
      * The Y position of the last down event.
      */
     private float mLastDownEventY;
 
     /**
-     * The time of the last down event.
+     * The X position of the last down or move event.
      */
-    private long mLastDownEventTime;
+    private float mLastDownOrMoveEventX;
 
     /**
      * The Y position of the last down or move event.
@@ -415,9 +400,9 @@ public class NumberPicker extends LinearLayout {
     private int mSelectionDividerColor;
 
     /**
-     * The height of the selection divider.
+     * The thickness of the selection divider.
      */
-    private final int mSelectionDividerHeight;
+    private final int mSelectionDividerThickness;
 
     /**
      * The current scroll state of the number picker.
@@ -446,19 +431,19 @@ public class NumberPicker extends LinearLayout {
     private int mBottomSelectionDividerBottom;
 
     /**
+     * The left of the top selection divider.
+     */
+    private int mLeftOfSelectionDividerLeft;
+
+    /**
+     * The right of the bottom selection divider.
+     */
+    private int mRightOfSelectionDividerRight;
+
+    /**
      * The virtual id of the last hovered child.
      */
     private int mLastHoveredChildVirtualViewId;
-
-    /**
-     * Whether the increment virtual button is pressed.
-     */
-    private boolean mIncrementVirtualButtonPressed;
-
-    /**
-     * Whether the decrement virtual button is pressed.
-     */
-    private boolean mDecrementVirtualButtonPressed;
 
     /**
      * Provider to report to clients the semantic structure of this widget.
@@ -466,20 +451,24 @@ public class NumberPicker extends LinearLayout {
     private SupportAccessibilityNodeProvider mAccessibilityNodeProvider;
 
     /**
-     * Helper class for managing pressed state of the virtual buttons.
-     */
-    private final PressedStateHelper mPressedStateHelper;
-
-    /**
      * The keycode of the last handled DPAD down event.
      */
     private int mLastHandledDownDpadKeyCode = -1;
 
+    /**
+     * The width of this widget.
+     */
     private float mWidth;
 
+    /**
+     * The height of this widget.
+     */
     private float mHeight;
 
-    private boolean mIsHorizontal = false;
+    /**
+     * The orientation of this widget.
+     */
+    private int mOrientation;
 
     /**
      * Interface to listen for changes of the current value.
@@ -576,11 +565,11 @@ public class NumberPicker extends LinearLayout {
 
         mSelectionDividerColor = attributesArray.getColor(R.styleable.NumberPicker_np_dividerColor, mSelectionDividerColor);
 
-        final int defSelectionDividerHeight = (int) TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDER_HEIGHT,
+        final int defSelectionDividerThickness = (int) TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDER_THICKNESS,
             getResources().getDisplayMetrics());
-        mSelectionDividerHeight = attributesArray.getDimensionPixelSize(
-            R.styleable.NumberPicker_np_dividerHeight, defSelectionDividerHeight);
+        mSelectionDividerThickness = attributesArray.getDimensionPixelSize(
+            R.styleable.NumberPicker_np_dividerThickness, defSelectionDividerThickness);
 
         final int defSelectionDividerDistance = (int) TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDERS_DISTANCE,
@@ -588,15 +577,22 @@ public class NumberPicker extends LinearLayout {
         mSelectionDividersDistance = attributesArray.getDimensionPixelSize(
             R.styleable.NumberPicker_np_dividerDistance, defSelectionDividerDistance);
 
-        mIsHorizontal = attributesArray.getBoolean(R.styleable.NumberPicker_np_horizontal, mIsHorizontal);
+        mOrientation = attributesArray.getInt(R.styleable.NumberPicker_np_orientation, VERTICAL);
 
         mWidth = attributesArray.getDimensionPixelSize(R.styleable.NumberPicker_np_width, SIZE_UNSPECIFIED);
         mHeight = attributesArray.getDimensionPixelSize(R.styleable.NumberPicker_np_height, SIZE_UNSPECIFIED);
 
-        mMinHeight = SIZE_UNSPECIFIED;
-        mMaxHeight = dpToPx(DEFAULT_MAX_HEIGHT);
-        mMinWidth = dpToPx(DEFAULT_MIN_WIDTH);
-        mMaxWidth = SIZE_UNSPECIFIED;
+        if (isHorizontalMode()) {
+            mMinHeight = SIZE_UNSPECIFIED;
+            mMaxHeight = dpToPx(DEFAULT_MIN_WIDTH);
+            mMinWidth = dpToPx(DEFAULT_MAX_HEIGHT);
+            mMaxWidth = SIZE_UNSPECIFIED;
+        } else {
+            mMinHeight = SIZE_UNSPECIFIED;
+            mMaxHeight = dpToPx(DEFAULT_MAX_HEIGHT);
+            mMinWidth = dpToPx(DEFAULT_MIN_WIDTH);
+            mMaxWidth = SIZE_UNSPECIFIED;
+        }
 
         mComputeMaxWidth = true;
 
@@ -607,8 +603,6 @@ public class NumberPicker extends LinearLayout {
         mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, mTextSize);
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         attributesArray.recycle();
-
-        mPressedStateHelper = new PressedStateHelper();
 
         // By default Linearlayout that we extend is not drawn. This is
         // its draw() method is not called but dispatchDraw() is called
@@ -698,8 +692,14 @@ public class NumberPicker extends LinearLayout {
             // need to do all this when we know our size
             initializeSelectorWheel();
             initializeFadingEdges();
-            mTopSelectionDividerTop = (getHeight() - mSelectionDividersDistance) / 2 - mSelectionDividerHeight;
-            mBottomSelectionDividerBottom = mTopSelectionDividerTop + 2 * mSelectionDividerHeight + mSelectionDividersDistance;
+
+            if (isHorizontalMode()) {
+                mLeftOfSelectionDividerLeft = (getWidth() - mSelectionDividersDistance) / 2 - mSelectionDividerThickness;
+                mRightOfSelectionDividerRight = mLeftOfSelectionDividerLeft + 2 * mSelectionDividerThickness + mSelectionDividersDistance;
+            } else {
+                mTopSelectionDividerTop = (getHeight() - mSelectionDividersDistance) / 2 - mSelectionDividerThickness;
+                mBottomSelectionDividerBottom = mTopSelectionDividerTop + 2 * mSelectionDividerThickness + mSelectionDividersDistance;
+            }
         }
     }
 
@@ -725,20 +725,38 @@ public class NumberPicker extends LinearLayout {
      */
     private boolean moveToFinalScrollerPosition(Scroller scroller) {
         scroller.forceFinished(true);
-        int amountToScroll = scroller.getFinalY() - scroller.getCurrY();
-        int futureScrollOffset = (mCurrentScrollOffset + amountToScroll) % mSelectorElementHeight;
-        int overshootAdjustment = mInitialScrollOffset - futureScrollOffset;
-        if (overshootAdjustment != 0) {
-            if (Math.abs(overshootAdjustment) > mSelectorElementHeight / 2) {
-                if (overshootAdjustment > 0) {
-                    overshootAdjustment -= mSelectorElementHeight;
-                } else {
-                    overshootAdjustment += mSelectorElementHeight;
+        if (isHorizontalMode()) {
+            int amountToScroll = scroller.getFinalX() - scroller.getCurrX();
+            int futureScrollOffset = (mCurrentScrollOffset + amountToScroll) % mSelectorElementSize;
+            int overshootAdjustment = mInitialScrollOffset - futureScrollOffset;
+            if (overshootAdjustment != 0) {
+                if (Math.abs(overshootAdjustment) > mSelectorElementSize / 2) {
+                    if (overshootAdjustment > 0) {
+                        overshootAdjustment -= mSelectorElementSize;
+                    } else {
+                        overshootAdjustment += mSelectorElementSize;
+                    }
                 }
+                amountToScroll += overshootAdjustment;
+                scrollBy(amountToScroll, 0);
+                return true;
             }
-            amountToScroll += overshootAdjustment;
-            scrollBy(0, amountToScroll);
-            return true;
+        } else {
+            int amountToScroll = scroller.getFinalY() - scroller.getCurrY();
+            int futureScrollOffset = (mCurrentScrollOffset + amountToScroll) % mSelectorElementSize;
+            int overshootAdjustment = mInitialScrollOffset - futureScrollOffset;
+            if (overshootAdjustment != 0) {
+                if (Math.abs(overshootAdjustment) > mSelectorElementSize / 2) {
+                    if (overshootAdjustment > 0) {
+                        overshootAdjustment -= mSelectorElementSize;
+                    } else {
+                        overshootAdjustment += mSelectorElementSize;
+                    }
+                }
+                amountToScroll += overshootAdjustment;
+                scrollBy(0, amountToScroll);
+                return true;
+            }
         }
         return false;
     }
@@ -750,40 +768,55 @@ public class NumberPicker extends LinearLayout {
             case MotionEvent.ACTION_DOWN: {
                 removeAllCallbacks();
                 mInputText.setVisibility(View.INVISIBLE);
-                mLastDownOrMoveEventY = mLastDownEventY = event.getY();
-                mLastDownEventTime = event.getEventTime();
-                mIngonreMoveEvents = false;
-                mShowSoftInputOnTap = false;
-                // Handle pressed state before any state change.
-                if (mLastDownEventY < mTopSelectionDividerTop) {
-                    if (mScrollState == OnScrollListener.SCROLL_STATE_IDLE) {
-                        mPressedStateHelper.buttonPressDelayed(PressedStateHelper.BUTTON_DECREMENT);
+                if (isHorizontalMode()) {
+                    mLastDownOrMoveEventX = mLastDownEventX = event.getX();
+                    mIngonreMoveEvents = false;
+                    mShowSoftInputOnTap = false;
+                    // Make sure we support flinging inside scrollables.
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    if (!mFlingScroller.isFinished()) {
+                        mFlingScroller.forceFinished(true);
+                        mAdjustScroller.forceFinished(true);
+                        onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
+                    } else if (!mAdjustScroller.isFinished()) {
+                        mFlingScroller.forceFinished(true);
+                        mAdjustScroller.forceFinished(true);
+                    } else if (mLastDownEventX < mLeftOfSelectionDividerLeft) {
+                        hideSoftInput();
+                        postChangeCurrentByOneFromLongPress(false, ViewConfiguration.getLongPressTimeout());
+                    } else if (mLastDownEventX > mRightOfSelectionDividerRight) {
+                        hideSoftInput();
+                        postChangeCurrentByOneFromLongPress(true, ViewConfiguration.getLongPressTimeout());
+                    } else {
+                        mShowSoftInputOnTap = true;
+                        postBeginSoftInputOnLongPressCommand();
                     }
-                } else if (mLastDownEventY > mBottomSelectionDividerBottom) {
-                    if (mScrollState == OnScrollListener.SCROLL_STATE_IDLE) {
-                        mPressedStateHelper.buttonPressDelayed(PressedStateHelper.BUTTON_INCREMENT);
-                    }
-                }
-                // Make sure we support flinging inside scrollables.
-                getParent().requestDisallowInterceptTouchEvent(true);
-                if (!mFlingScroller.isFinished()) {
-                    mFlingScroller.forceFinished(true);
-                    mAdjustScroller.forceFinished(true);
-                    onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
-                } else if (!mAdjustScroller.isFinished()) {
-                    mFlingScroller.forceFinished(true);
-                    mAdjustScroller.forceFinished(true);
-                } else if (mLastDownEventY < mTopSelectionDividerTop) {
-                    hideSoftInput();
-                    postChangeCurrentByOneFromLongPress(false, ViewConfiguration.getLongPressTimeout());
-                } else if (mLastDownEventY > mBottomSelectionDividerBottom) {
-                    hideSoftInput();
-                    postChangeCurrentByOneFromLongPress(true, ViewConfiguration.getLongPressTimeout());
+                    return true;
                 } else {
-                    mShowSoftInputOnTap = true;
-                    postBeginSoftInputOnLongPressCommand();
+                    mLastDownOrMoveEventY = mLastDownEventY = event.getY();
+                    mIngonreMoveEvents = false;
+                    mShowSoftInputOnTap = false;
+                    // Make sure we support flinging inside scrollables.
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    if (!mFlingScroller.isFinished()) {
+                        mFlingScroller.forceFinished(true);
+                        mAdjustScroller.forceFinished(true);
+                        onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
+                    } else if (!mAdjustScroller.isFinished()) {
+                        mFlingScroller.forceFinished(true);
+                        mAdjustScroller.forceFinished(true);
+                    } else if (mLastDownEventX < mLeftOfSelectionDividerLeft) {
+                        hideSoftInput();
+                        postChangeCurrentByOneFromLongPress(false, ViewConfiguration.getLongPressTimeout());
+                    } else if (mLastDownEventX > mRightOfSelectionDividerRight) {
+                        hideSoftInput();
+                        postChangeCurrentByOneFromLongPress(true, ViewConfiguration.getLongPressTimeout());
+                    } else {
+                        mShowSoftInputOnTap = true;
+                        postBeginSoftInputOnLongPressCommand();
+                    }
+                    return true;
                 }
-                return true;
             }
         }
         return false;
@@ -804,60 +837,99 @@ public class NumberPicker extends LinearLayout {
                 if (mIngonreMoveEvents) {
                     break;
                 }
-                float currentMoveY = event.getY();
-                if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    int deltaDownY = (int) Math.abs(currentMoveY - mLastDownEventY);
-                    if (deltaDownY > mTouchSlop) {
-                        removeAllCallbacks();
-                        onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+                if (isHorizontalMode()) {
+                    float currentMoveX = event.getX();
+                    if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                        int deltaDownX = (int) Math.abs(currentMoveX - mLastDownEventX);
+                        if (deltaDownX > mTouchSlop) {
+                            removeAllCallbacks();
+                            onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+                        }
+                    } else {
+                        int deltaMoveX = (int) ((currentMoveX - mLastDownOrMoveEventX));
+                        scrollBy(deltaMoveX, 0);
+                        invalidate();
                     }
+                    mLastDownOrMoveEventX = currentMoveX;
                 } else {
-                    int deltaMoveY = (int) ((currentMoveY - mLastDownOrMoveEventY));
-                    scrollBy(0, deltaMoveY);
-                    invalidate();
+                    float currentMoveY = event.getY();
+                    if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                        int deltaDownY = (int) Math.abs(currentMoveY - mLastDownEventY);
+                        if (deltaDownY > mTouchSlop) {
+                            removeAllCallbacks();
+                            onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+                        }
+                    } else {
+                        int deltaMoveY = (int) ((currentMoveY - mLastDownOrMoveEventY));
+                        scrollBy(0, deltaMoveY);
+                        invalidate();
+                    }
+                    mLastDownOrMoveEventY = currentMoveY;
                 }
-                mLastDownOrMoveEventY = currentMoveY;
-            } break;
+            }
+            break;
             case MotionEvent.ACTION_UP: {
                 removeBeginSoftInputCommand();
                 removeChangeCurrentByOneFromLongPress();
-                mPressedStateHelper.cancel();
                 VelocityTracker velocityTracker = mVelocityTracker;
                 velocityTracker.computeCurrentVelocity(1000, mMaximumFlingVelocity);
-                int initialVelocity = (int) velocityTracker.getYVelocity();
-                if (Math.abs(initialVelocity) > mMinimumFlingVelocity) {
-                    fling(initialVelocity);
-                    onScrollStateChange(OnScrollListener.SCROLL_STATE_FLING);
-                } else {
-                    int eventY = (int) event.getY();
-                    int deltaMoveY = (int) Math.abs(eventY - mLastDownEventY);
-                    long deltaTime = event.getEventTime() - mLastDownEventTime;
-                    long tapTimeout = ViewConfiguration.getTapTimeout();
-                    if (deltaMoveY <= mTouchSlop) { // && deltaTime < ViewConfiguration.getTapTimeout()) {
-                        if (mShowSoftInputOnTap) {
-                            mShowSoftInputOnTap = false;
-                            showSoftInput();
-                        } else {
-                            int selectorIndexOffset = (eventY / mSelectorElementHeight)
-                                    - SELECTOR_MIDDLE_ITEM_INDEX;
-                            if (selectorIndexOffset > 0) {
-                                changeValueByOne(true);
-                                mPressedStateHelper.buttonTapped(
-                                        PressedStateHelper.BUTTON_INCREMENT);
-                            } else if (selectorIndexOffset < 0) {
-                                changeValueByOne(false);
-                                mPressedStateHelper.buttonTapped(
-                                        PressedStateHelper.BUTTON_DECREMENT);
-                            }
-                        }
+                if (isHorizontalMode()) {
+                    int initialVelocity = (int) velocityTracker.getXVelocity();
+                    if (Math.abs(initialVelocity) > mMinimumFlingVelocity) {
+                        fling(initialVelocity);
+                        onScrollStateChange(OnScrollListener.SCROLL_STATE_FLING);
                     } else {
-                        ensureScrollWheelAdjusted();
+                        int eventX = (int) event.getX();
+                        int deltaMoveX = (int) Math.abs(eventX - mLastDownEventX);
+                        if (deltaMoveX <= mTouchSlop) { // && deltaTime < ViewConfiguration.getTapTimeout()) {
+                            if (mShowSoftInputOnTap) {
+                                mShowSoftInputOnTap = false;
+                                showSoftInput();
+                            } else {
+                                int selectorIndexOffset = (eventX / mSelectorElementSize) - SELECTOR_MIDDLE_ITEM_INDEX;
+                                if (selectorIndexOffset > 0) {
+                                    changeValueByOne(true);
+                                } else if (selectorIndexOffset < 0) {
+                                    changeValueByOne(false);
+                                }
+                            }
+                        } else {
+                            ensureScrollWheelAdjusted();
+                        }
+                        onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
                     }
-                    onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
+                } else {
+                    int initialVelocity = (int) velocityTracker.getYVelocity();
+                    if (Math.abs(initialVelocity) > mMinimumFlingVelocity) {
+                        fling(initialVelocity);
+                        onScrollStateChange(OnScrollListener.SCROLL_STATE_FLING);
+                    } else {
+                        int eventY = (int) event.getY();
+                        int deltaMoveY = (int) Math.abs(eventY - mLastDownEventY);
+                        if (deltaMoveY <= mTouchSlop) { // && deltaTime < ViewConfiguration.getTapTimeout()) {
+                            if (mShowSoftInputOnTap) {
+                                mShowSoftInputOnTap = false;
+                                showSoftInput();
+                            } else {
+                                int selectorIndexOffset = (eventY / mSelectorElementSize) - SELECTOR_MIDDLE_ITEM_INDEX;
+                                if (selectorIndexOffset > 0) {
+                                    changeValueByOne(true);
+                                } else if (selectorIndexOffset < 0) {
+                                    changeValueByOne(false);
+                                }
+                            }
+                        } else {
+                            ensureScrollWheelAdjusted();
+                        }
+                        onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
+                    }
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
                 }
-                mVelocityTracker.recycle();
-                mVelocityTracker = null;
-            } break;
+            }
+            break;
         }
         return true;
     }
@@ -923,44 +995,50 @@ public class NumberPicker extends LinearLayout {
     @Override
     protected boolean dispatchHoverEvent(MotionEvent event) {
         if (((AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE)).isEnabled()) {
-            final int eventY = (int) event.getY();
             final int hoveredVirtualViewId;
-            if (eventY < mTopSelectionDividerTop) {
-                hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_DECREMENT;
-            } else if (eventY > mBottomSelectionDividerBottom) {
-                hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_INCREMENT;
+            if (isHorizontalMode()) {
+                final int eventX = (int) event.getX();
+                if (eventX < mLeftOfSelectionDividerLeft) {
+                    hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_DECREMENT;
+                } else if (eventX > mRightOfSelectionDividerRight) {
+                    hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_INCREMENT;
+                } else {
+                    hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_INPUT;
+                }
             } else {
-                hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_INPUT;
+                final int eventY = (int) event.getY();
+                if (eventY < mTopSelectionDividerTop) {
+                    hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_DECREMENT;
+                } else if (eventY > mBottomSelectionDividerBottom) {
+                    hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_INCREMENT;
+                } else {
+                    hoveredVirtualViewId = AccessibilityNodeProviderImpl.VIRTUAL_VIEW_ID_INPUT;
+                }
             }
             final int action = event.getAction() & MotionEvent.ACTION_MASK;
             SupportAccessibilityNodeProvider provider = getSupportAccessibilityNodeProvider();
 
             switch (action) {
-                case MotionEvent.ACTION_HOVER_ENTER: {
-                    provider.sendAccessibilityEventForVirtualView(hoveredVirtualViewId,
-                            AccessibilityEvent.TYPE_VIEW_HOVER_ENTER);
+            case MotionEvent.ACTION_HOVER_ENTER: {
+                provider.sendAccessibilityEventForVirtualView(hoveredVirtualViewId, AccessibilityEvent.TYPE_VIEW_HOVER_ENTER);
+                mLastHoveredChildVirtualViewId = hoveredVirtualViewId;
+                provider.performAction(hoveredVirtualViewId, AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
+                break;
+            }
+            case MotionEvent.ACTION_HOVER_MOVE: {
+                if (mLastHoveredChildVirtualViewId != hoveredVirtualViewId && mLastHoveredChildVirtualViewId != View.NO_ID) {
+                    provider.sendAccessibilityEventForVirtualView(mLastHoveredChildVirtualViewId, AccessibilityEvent.TYPE_VIEW_HOVER_EXIT);
+                    provider.sendAccessibilityEventForVirtualView(hoveredVirtualViewId, AccessibilityEvent.TYPE_VIEW_HOVER_ENTER);
                     mLastHoveredChildVirtualViewId = hoveredVirtualViewId;
-                    provider.performAction(hoveredVirtualViewId,
-                            AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
-                } break;
-                case MotionEvent.ACTION_HOVER_MOVE: {
-                    if (mLastHoveredChildVirtualViewId != hoveredVirtualViewId
-                            && mLastHoveredChildVirtualViewId != View.NO_ID) {
-                        provider.sendAccessibilityEventForVirtualView(
-                                mLastHoveredChildVirtualViewId,
-                                AccessibilityEvent.TYPE_VIEW_HOVER_EXIT);
-                        provider.sendAccessibilityEventForVirtualView(hoveredVirtualViewId,
-                                AccessibilityEvent.TYPE_VIEW_HOVER_ENTER);
-                        mLastHoveredChildVirtualViewId = hoveredVirtualViewId;
-                        provider.performAction(hoveredVirtualViewId,
-                                AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
-                    }
-                } break;
-                case MotionEvent.ACTION_HOVER_EXIT: {
-                    provider.sendAccessibilityEventForVirtualView(hoveredVirtualViewId,
-                            AccessibilityEvent.TYPE_VIEW_HOVER_EXIT);
-                    mLastHoveredChildVirtualViewId = View.NO_ID;
-                } break;
+                    provider.performAction(hoveredVirtualViewId, AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
+                }
+                break;
+            }
+            case MotionEvent.ACTION_HOVER_EXIT: {
+                provider.sendAccessibilityEventForVirtualView(hoveredVirtualViewId, AccessibilityEvent.TYPE_VIEW_HOVER_EXIT);
+                mLastHoveredChildVirtualViewId = View.NO_ID;
+                break;
+            }
             }
         }
         return false;
@@ -976,12 +1054,21 @@ public class NumberPicker extends LinearLayout {
             }
         }
         scroller.computeScrollOffset();
-        int currentScrollerY = scroller.getCurrY();
-        if (mPreviousScrollerY == 0) {
-            mPreviousScrollerY = scroller.getStartY();
+        if (isHorizontalMode()) {
+            int currentScrollerX = scroller.getCurrX();
+            if (mPreviousScrollerX == 0) {
+                mPreviousScrollerX = scroller.getStartX();
+            }
+            scrollBy(currentScrollerX - mPreviousScrollerX, 0);
+            mPreviousScrollerX = currentScrollerX;
+        } else {
+            int currentScrollerY = scroller.getCurrY();
+            if (mPreviousScrollerY == 0) {
+                mPreviousScrollerY = scroller.getStartY();
+            }
+            scrollBy(0, currentScrollerY - mPreviousScrollerY);
+            mPreviousScrollerY = currentScrollerY;
         }
-        scrollBy(0, currentScrollerY - mPreviousScrollerY);
-        mPreviousScrollerY = currentScrollerY;
         if (scroller.isFinished()) {
             onScrollerFinished(scroller);
         } else {
@@ -1008,21 +1095,41 @@ public class NumberPicker extends LinearLayout {
             mCurrentScrollOffset = mInitialScrollOffset;
             return;
         }
-        mCurrentScrollOffset += y;
-        while (mCurrentScrollOffset - mInitialScrollOffset > mSelectorTextGapHeight) {
-            mCurrentScrollOffset -= mSelectorElementHeight;
-            decrementSelectorIndices(selectorIndices);
-            setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
-            if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue) {
-                mCurrentScrollOffset = mInitialScrollOffset;
+        if (isHorizontalMode()) {
+            mCurrentScrollOffset += x;
+            while (mCurrentScrollOffset - mInitialScrollOffset > mSelectorTextGapWidth) {
+                mCurrentScrollOffset -= mSelectorElementSize;
+                decrementSelectorIndices(selectorIndices);
+                setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
+                if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                }
             }
-        }
-        while (mCurrentScrollOffset - mInitialScrollOffset < -mSelectorTextGapHeight) {
-            mCurrentScrollOffset += mSelectorElementHeight;
-            incrementSelectorIndices(selectorIndices);
-            setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
-            if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue) {
-                mCurrentScrollOffset = mInitialScrollOffset;
+            while (mCurrentScrollOffset - mInitialScrollOffset < -mSelectorTextGapWidth) {
+                mCurrentScrollOffset += mSelectorElementSize;
+                incrementSelectorIndices(selectorIndices);
+                setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
+                if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                }
+            }
+        } else {
+            mCurrentScrollOffset += y;
+            while (mCurrentScrollOffset - mInitialScrollOffset > mSelectorTextGapHeight) {
+                mCurrentScrollOffset -= mSelectorElementSize;
+                decrementSelectorIndices(selectorIndices);
+                setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
+                if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] <= mMinValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                }
+            }
+            while (mCurrentScrollOffset - mInitialScrollOffset < -mSelectorTextGapHeight) {
+                mCurrentScrollOffset += mSelectorElementSize;
+                incrementSelectorIndices(selectorIndices);
+                setValueInternal(selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX], true);
+                if (!mWrapSelectorWheel && selectorIndices[SELECTOR_MIDDLE_ITEM_INDEX] >= mMaxValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                }
             }
         }
     }
@@ -1330,12 +1437,22 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     protected float getTopFadingEdgeStrength() {
-        return TOP_AND_BOTTOM_FADING_EDGE_STRENGTH;
+        return isHorizontalMode() ? 0: FADING_EDGE_STRENGTH;
     }
 
     @Override
     protected float getBottomFadingEdgeStrength() {
-        return TOP_AND_BOTTOM_FADING_EDGE_STRENGTH;
+        return isHorizontalMode() ? 0: FADING_EDGE_STRENGTH;
+    }
+
+    @Override
+    protected float getLeftFadingEdgeStrength() {
+        return isHorizontalMode() ? FADING_EDGE_STRENGTH : 0;
+    }
+
+    @Override
+    protected float getRightFadingEdgeStrength() {
+        return isHorizontalMode() ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
@@ -1346,8 +1463,14 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float x = (getRight() - getLeft()) / 2;
-        float y = mCurrentScrollOffset;
+        float x, y;
+        if (isHorizontalMode()) {
+            x = mCurrentScrollOffset;
+            y = mInputText.getBaseline() + mInputText.getTop();
+        } else {
+            x = (getRight() - getLeft()) / 2;
+            y = mCurrentScrollOffset;
+        }
 
         // draw the selector wheel
         int[] selectorIndices = mSelectorIndices;
@@ -1362,22 +1485,41 @@ public class NumberPicker extends LinearLayout {
             if (i != SELECTOR_MIDDLE_ITEM_INDEX || mInputText.getVisibility() != VISIBLE) {
                 canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaint);
             }
-            y += mSelectorElementHeight;
+
+            if (isHorizontalMode()) {
+                x += mSelectorElementSize;
+            } else {
+                y += mSelectorElementSize;
+            }
         }
 
         // draw the selection dividers
         if (mSelectionDivider != null) {
-            // draw the top divider
-            int topOfTopDivider = mTopSelectionDividerTop;
-            int bottomOfTopDivider = topOfTopDivider + mSelectionDividerHeight;
-            mSelectionDivider.setBounds(0, topOfTopDivider, getRight(), bottomOfTopDivider);
-            mSelectionDivider.draw(canvas);
+            if (isHorizontalMode()) {
+                // draw the left divider
+                int leftOfLeftDivider = mLeftOfSelectionDividerLeft;
+                int rightOfLeftDivider = leftOfLeftDivider + mSelectionDividerThickness;
+                mSelectionDivider.setBounds(leftOfLeftDivider, 0, rightOfLeftDivider, getBottom());
+                mSelectionDivider.draw(canvas);
 
-            // draw the bottom divider
-            int bottomOfBottomDivider = mBottomSelectionDividerBottom;
-            int topOfBottomDivider = bottomOfBottomDivider - mSelectionDividerHeight;
-            mSelectionDivider.setBounds(0, topOfBottomDivider, getRight(), bottomOfBottomDivider);
-            mSelectionDivider.draw(canvas);
+                // draw the right divider
+                int rightOfRightDivider = mRightOfSelectionDividerRight;
+                int leftOfRightDivider = rightOfRightDivider - mSelectionDividerThickness;
+                mSelectionDivider.setBounds(leftOfRightDivider, 0, rightOfRightDivider, getBottom());
+                mSelectionDivider.draw(canvas);
+            } else {
+                // draw the top divider
+                int topOfTopDivider = mTopSelectionDividerTop;
+                int bottomOfTopDivider = topOfTopDivider + mSelectionDividerThickness;
+                mSelectionDivider.setBounds(0, topOfTopDivider, getRight(), bottomOfTopDivider);
+                mSelectionDivider.draw(canvas);
+
+                // draw the bottom divider
+                int bottomOfBottomDivider = mBottomSelectionDividerBottom;
+                int topOfBottomDivider = bottomOfBottomDivider - mSelectionDividerThickness;
+                mSelectionDivider.setBounds(0, topOfBottomDivider, getRight(), bottomOfBottomDivider);
+                mSelectionDivider.draw(canvas);
+            }
         }
     }
 
@@ -1386,8 +1528,15 @@ public class NumberPicker extends LinearLayout {
         super.onInitializeAccessibilityEvent(event);
         event.setClassName(NumberPicker.class.getName());
         event.setScrollable(true);
-        event.setScrollY((mMinValue + mValue) * mSelectorElementHeight);
-        event.setMaxScrollY((mMaxValue - mMinValue) * mSelectorElementHeight);
+        final int scroll = (mMinValue + mValue) * mSelectorElementSize;
+        final int maxScroll = (mMaxValue - mMinValue) * mSelectorElementSize;
+        if (isHorizontalMode()) {
+            event.setScrollX(scroll);
+            event.setMaxScrollX(maxScroll);
+        } else {
+            event.setScrollY(scroll);
+            event.setMaxScrollY(maxScroll);
+        }
     }
 
     @Override
@@ -1534,11 +1683,20 @@ public class NumberPicker extends LinearLayout {
         if (!moveToFinalScrollerPosition(mFlingScroller)) {
             moveToFinalScrollerPosition(mAdjustScroller);
         }
-        mPreviousScrollerY = 0;
-        if (increment) {
-            mFlingScroller.startScroll(0, 0, 0, -mSelectorElementHeight, SNAP_SCROLL_DURATION);
+        if (isHorizontalMode()) {
+            mPreviousScrollerX = 0;
+            if (increment) {
+                mFlingScroller.startScroll(0, 0, -mSelectorElementSize, 0, SNAP_SCROLL_DURATION);
+            } else {
+                mFlingScroller.startScroll(0, 0, mSelectorElementSize, 0, SNAP_SCROLL_DURATION);
+            }
         } else {
-            mFlingScroller.startScroll(0, 0, 0, mSelectorElementHeight, SNAP_SCROLL_DURATION);
+            mPreviousScrollerY = 0;
+            if (increment) {
+                mFlingScroller.startScroll(0, 0, 0, -mSelectorElementSize, SNAP_SCROLL_DURATION);
+            } else {
+                mFlingScroller.startScroll(0, 0, 0, mSelectorElementSize, SNAP_SCROLL_DURATION);
+            }
         }
         invalidate();
     }
@@ -1546,22 +1704,36 @@ public class NumberPicker extends LinearLayout {
     private void initializeSelectorWheel() {
         initializeSelectorWheelIndices();
         int[] selectorIndices = mSelectorIndices;
-        int totalTextHeight = selectorIndices.length * (int) mTextSize;
-        float totalTextGapHeight = (getBottom() - getTop()) - totalTextHeight;
-        float textGapCount = selectorIndices.length;
-        mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount + 0.5f);
-        mSelectorElementHeight = (int) mTextSize + mSelectorTextGapHeight;
-        // Ensure that the middle item is positioned the same as the text in
-        // mInputText
-        int editTextTextPosition = mInputText.getBaseline() + mInputText.getTop();
-        mInitialScrollOffset = editTextTextPosition - (mSelectorElementHeight * SELECTOR_MIDDLE_ITEM_INDEX);
+        int totalTextSize = selectorIndices.length * (int) mTextSize;
+        int editTextTextPosition;
+        if (isHorizontalMode()) {
+            float totalTextGapWidth = (getRight() - getLeft()) - totalTextSize;
+            float textGapCount = selectorIndices.length;
+            mSelectorTextGapWidth = (int) (totalTextGapWidth / textGapCount + 0.5f);
+            mSelectorElementSize = (int) mTextSize + mSelectorTextGapWidth;
+            // Ensure that the middle item is positioned the same as the text in mInputText
+            editTextTextPosition = mInputText.getRight() / 2;
+        } else {
+            float totalTextGapHeight = (getBottom() - getTop()) - totalTextSize;
+            float textGapCount = selectorIndices.length;
+            mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount + 0.5f);
+            mSelectorElementSize = (int) mTextSize + mSelectorTextGapHeight;
+            // Ensure that the middle item is positioned the same as the text in mInputText
+            editTextTextPosition = mInputText.getBaseline() + mInputText.getTop();
+        }
+        mInitialScrollOffset = editTextTextPosition - (mSelectorElementSize * SELECTOR_MIDDLE_ITEM_INDEX);
         mCurrentScrollOffset = mInitialScrollOffset;
         updateInputTextView();
     }
 
     private void initializeFadingEdges() {
-        setVerticalFadingEdgeEnabled(true);
-        setFadingEdgeLength((getBottom() - getTop() - (int) mTextSize) / 2);
+        if (isHorizontalMode()) {
+            setHorizontalFadingEdgeEnabled(true);
+            setFadingEdgeLength((getRight() - getLeft() - (int) mTextSize) / 2);
+        } else {
+            setVerticalFadingEdgeEnabled(true);
+            setFadingEdgeLength((getBottom() - getTop() - (int) mTextSize) / 2);
+        }
     }
 
     /**
@@ -1596,13 +1768,21 @@ public class NumberPicker extends LinearLayout {
     /**
      * Flings the selector with the given <code>velocityY</code>.
      */
-    private void fling(int velocityY) {
-        mPreviousScrollerY = 0;
-
-        if (velocityY > 0) {
-            mFlingScroller.fling(0, 0, 0, velocityY, 0, 0, 0, Integer.MAX_VALUE);
+    private void fling(int velocity) {
+        if (isHorizontalMode()) {
+            mPreviousScrollerX = 0;
+            if (velocity > 0) {
+                mFlingScroller.fling(0, 0, velocity, 0, 0, Integer.MAX_VALUE, 0, 0);
+            } else {
+                mFlingScroller.fling(Integer.MAX_VALUE, 0, velocity, 0, 0, Integer.MAX_VALUE, 0, 0);
+            }
         } else {
-            mFlingScroller.fling(0, Integer.MAX_VALUE, 0, velocityY, 0, 0, 0, Integer.MAX_VALUE);
+            mPreviousScrollerY = 0;
+            if (velocity > 0) {
+                mFlingScroller.fling(0, 0, 0, velocity, 0, 0, 0, Integer.MAX_VALUE);
+            } else {
+                mFlingScroller.fling(0, Integer.MAX_VALUE, 0, velocity, 0, 0, 0, Integer.MAX_VALUE);
+            }
         }
 
         invalidate();
@@ -1677,18 +1857,6 @@ public class NumberPicker extends LinearLayout {
 
     private String formatNumber(int value) {
         return (mFormatter != null) ? mFormatter.format(value) : formatNumberWithLocale(value);
-    }
-
-    private void validateInputTextView(View v) {
-        String str = String.valueOf(((TextView) v).getText());
-        if (TextUtils.isEmpty(str)) {
-            // Restore to the old value as we don't allow empty values
-            updateInputTextView();
-        } else {
-            // Check the new value and ensure it's in range
-            int current = getSelectedPos(str.toString());
-            setValueInternal(current, true);
-        }
     }
 
     /**
@@ -1784,7 +1952,6 @@ public class NumberPicker extends LinearLayout {
         if (mBeginSoftInputOnLongPressCommand != null) {
             removeCallbacks(mBeginSoftInputOnLongPressCommand);
         }
-        mPressedStateHelper.cancel();
     }
 
     /**
@@ -1813,7 +1980,6 @@ public class NumberPicker extends LinearLayout {
             try {
                 return Integer.parseInt(value);
             } catch (NumberFormatException e) {
-
                 // Ignore as if it's not a number we don't care
             }
         }
@@ -1839,14 +2005,14 @@ public class NumberPicker extends LinearLayout {
      * The numbers accepted by the input text's {@link Filter}
      */
     private static final char[] DIGIT_CHARACTERS = new char[] {
-            // Latin digits are the common case
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            // Arabic-Indic
-            '\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668'
-            , '\u0669',
-            // Extended Arabic-Indic
-            '\u06f0', '\u06f1', '\u06f2', '\u06f3', '\u06f4', '\u06f5', '\u06f6', '\u06f7', '\u06f8'
-            , '\u06f9'
+        // Latin digits are the common case
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        // Arabic-Indic
+        '\u0660', '\u0661', '\u0662', '\u0663', '\u0664',
+        '\u0665', '\u0666', '\u0667', '\u0668', '\u0669',
+        // Extended Arabic-Indic
+        '\u06f0', '\u06f1', '\u06f2', '\u06f3', '\u06f4',
+        '\u06f5', '\u06f6', '\u06f7', '\u06f8', '\u06f9'
     };
 
     /**
@@ -1855,8 +2021,7 @@ public class NumberPicker extends LinearLayout {
      */
     class InputTextFilter extends NumberKeyListener {
 
-        // XXX This doesn't allow for range limits when controlled by a
-        // soft input method!
+        // XXX This doesn't allow for range limits when controlled by a soft input method!
         public int getInputType() {
             return InputType.TYPE_CLASS_TEXT;
         }
@@ -1867,8 +2032,7 @@ public class NumberPicker extends LinearLayout {
         }
 
         @Override
-        public CharSequence filter(
-                CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             if (mDisplayedValues == null) {
                 CharSequence filtered = super.filter(source, start, end, dest, dstart, dend);
                 if (filtered == null) {
@@ -1876,7 +2040,7 @@ public class NumberPicker extends LinearLayout {
                 }
 
                 String result = String.valueOf(dest.subSequence(0, dstart)) + filtered
-                        + dest.subSequence(dend, dest.length());
+                    + dest.subSequence(dend, dest.length());
 
                 if ("".equals(result)) {
                     return result;
@@ -1899,7 +2063,7 @@ public class NumberPicker extends LinearLayout {
                     return "";
                 }
                 String result = String.valueOf(dest.subSequence(0, dstart)) + filtered
-                        + dest.subSequence(dend, dest.length());
+                    + dest.subSequence(dend, dest.length());
                 String str = String.valueOf(result).toLowerCase();
                 for (String val : mDisplayedValues) {
                     String valLowerCase = val.toLowerCase();
@@ -1921,94 +2085,22 @@ public class NumberPicker extends LinearLayout {
      */
     private boolean ensureScrollWheelAdjusted() {
         // adjust to the closest value
-        int deltaY = mInitialScrollOffset - mCurrentScrollOffset;
-        if (deltaY != 0) {
-            mPreviousScrollerY = 0;
-            if (Math.abs(deltaY) > mSelectorElementHeight / 2) {
-                deltaY += (deltaY > 0) ? -mSelectorElementHeight : mSelectorElementHeight;
+        int delta = mInitialScrollOffset - mCurrentScrollOffset;
+        if (delta != 0) {
+            if (Math.abs(delta) > mSelectorElementSize / 2) {
+                delta += (delta > 0) ? -mSelectorElementSize : mSelectorElementSize;
             }
-            mAdjustScroller.startScroll(0, 0, 0, deltaY, SELECTOR_ADJUSTMENT_DURATION_MILLIS);
+            if (isHorizontalMode()) {
+                mPreviousScrollerX = 0;
+                mAdjustScroller.startScroll(0, 0, delta, 0, SELECTOR_ADJUSTMENT_DURATION_MILLIS);
+            } else {
+                mPreviousScrollerY = 0;
+                mAdjustScroller.startScroll(0, 0, 0, delta, SELECTOR_ADJUSTMENT_DURATION_MILLIS);
+            }
             invalidate();
             return true;
         }
         return false;
-    }
-
-    class PressedStateHelper implements Runnable {
-        public static final int BUTTON_INCREMENT = 1;
-        public static final int BUTTON_DECREMENT = 2;
-
-        private final int MODE_PRESS = 1;
-        private final int MODE_TAPPED = 2;
-
-        private int mManagedButton;
-        private int mMode;
-
-        public void cancel() {
-            mMode = 0;
-            mManagedButton = 0;
-            NumberPicker.this.removeCallbacks(this);
-            if (mIncrementVirtualButtonPressed) {
-                mIncrementVirtualButtonPressed = false;
-                invalidate(0, mBottomSelectionDividerBottom, getRight(), getBottom());
-            }
-            mDecrementVirtualButtonPressed = false;
-            if (mDecrementVirtualButtonPressed) {
-                invalidate(0, 0, getRight(), mTopSelectionDividerTop);
-            }
-        }
-
-        public void buttonPressDelayed(int button) {
-            cancel();
-            mMode = MODE_PRESS;
-            mManagedButton = button;
-            NumberPicker.this.postDelayed(this, ViewConfiguration.getTapTimeout());
-        }
-
-        public void buttonTapped(int button) {
-            cancel();
-            mMode = MODE_TAPPED;
-            mManagedButton = button;
-            NumberPicker.this.post(this);
-        }
-
-        @Override
-        public void run() {
-            switch (mMode) {
-                case MODE_PRESS: {
-                    switch (mManagedButton) {
-                        case BUTTON_INCREMENT: {
-                            mIncrementVirtualButtonPressed = true;
-                            invalidate(0, mBottomSelectionDividerBottom, getRight(), getBottom());
-                        } break;
-                        case BUTTON_DECREMENT: {
-                            mDecrementVirtualButtonPressed = true;
-                            invalidate(0, 0, getRight(), mTopSelectionDividerTop);
-                        }
-                    }
-                } break;
-                case MODE_TAPPED: {
-                    switch (mManagedButton) {
-                        case BUTTON_INCREMENT: {
-                            if (!mIncrementVirtualButtonPressed) {
-                                NumberPicker.this.postDelayed(this,
-                                        ViewConfiguration.getPressedStateDuration());
-                            }
-                            mIncrementVirtualButtonPressed ^= true;
-                            invalidate(0, mBottomSelectionDividerBottom, getRight(), getBottom());
-                        } break;
-                        case BUTTON_DECREMENT: {
-                            if (!mDecrementVirtualButtonPressed) {
-                                NumberPicker.this.postDelayed(this,
-                                        ViewConfiguration.getPressedStateDuration());
-                            }
-                            mDecrementVirtualButtonPressed ^= true;
-                            invalidate(0, 0, getRight(), mTopSelectionDividerTop);
-                        }
-                    }
-                } break;
-            }
-        }
     }
 
     /**
@@ -2120,20 +2212,34 @@ public class NumberPicker extends LinearLayout {
         public AccessibilityNodeInfo createAccessibilityNodeInfo(int virtualViewId) {
             switch (virtualViewId) {
                 case View.NO_ID:
-                    return createAccessibilityNodeInfoForNumberPicker( getScrollX(), getScrollY(),
-                            getScrollX() + (getRight() - getLeft()), getScrollY() + (getBottom() - getTop()));
+                    return createAccessibilityNodeInfoForNumberPicker(getScrollX(), getScrollY(),
+                        getScrollX() + (getRight() - getLeft()), getScrollY() + (getBottom() - getTop()));
                 case VIRTUAL_VIEW_ID_DECREMENT:
-                    return createAccessibilityNodeInfoForVirtualButton(VIRTUAL_VIEW_ID_DECREMENT,
+                    if (isHorizontalMode()) {
+                        return createAccessibilityNodeInfoForVirtualButton(VIRTUAL_VIEW_ID_DECREMENT,
+                            getVirtualDecrementButtonText(), getScrollX(), getScrollY(),
+                            mLeftOfSelectionDividerLeft + mSelectionDividerThickness,
+                            getScrollY() + (getBottom() - getBottom()));
+                    } else {
+                        return createAccessibilityNodeInfoForVirtualButton(VIRTUAL_VIEW_ID_DECREMENT,
                             getVirtualDecrementButtonText(), getScrollX(), getScrollY(),
                             getScrollX() + (getRight() - getLeft()),
-                            mTopSelectionDividerTop + mSelectionDividerHeight);
+                            mTopSelectionDividerTop + mSelectionDividerThickness);
+                    }
                 case VIRTUAL_VIEW_ID_INPUT:
                     return createAccessibiltyNodeInfoForInputText();
                 case VIRTUAL_VIEW_ID_INCREMENT:
-                    return createAccessibilityNodeInfoForVirtualButton(VIRTUAL_VIEW_ID_INCREMENT,
-                            getVirtualIncrementButtonText(), getScrollX(),
-                            mBottomSelectionDividerBottom - mSelectionDividerHeight,
+                    if (isHorizontalMode()) {
+                        return createAccessibilityNodeInfoForVirtualButton(VIRTUAL_VIEW_ID_INCREMENT,
+                            getVirtualIncrementButtonText(),
+                            mRightOfSelectionDividerRight - mSelectionDividerThickness, getScrollY(),
                             getScrollX() + (getRight() - getLeft()), getScrollY() + (getBottom() - getTop()));
+                    } else {
+                        return createAccessibilityNodeInfoForVirtualButton(VIRTUAL_VIEW_ID_INCREMENT,
+                            getVirtualIncrementButtonText(), getScrollX(),
+                            mBottomSelectionDividerBottom - mSelectionDividerThickness,
+                            getScrollX() + (getRight() - getLeft()), getScrollY() + (getBottom() - getTop()));
+                    }
             }
             return super.createAccessibilityNodeInfo(virtualViewId);
         }
@@ -2190,15 +2296,13 @@ public class NumberPicker extends LinearLayout {
                             return false;
                         }
                         case AccessibilityNodeInfo.ACTION_SCROLL_FORWARD: {
-                            if (NumberPicker.this.isEnabled()
-                                    && (getWrapSelectorWheel() || getValue() < getMaxValue())) {
+                            if (NumberPicker.this.isEnabled() && (getWrapSelectorWheel() || getValue() < getMaxValue())) {
                                 changeValueByOne(true);
                                 return true;
                             }
                         } return false;
                         case AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD: {
-                            if (NumberPicker.this.isEnabled()
-                                    && (getWrapSelectorWheel() || getValue() > getMinValue())) {
+                            if (NumberPicker.this.isEnabled() && (getWrapSelectorWheel() || getValue() > getMinValue())) {
                                 changeValueByOne(false);
                                 return true;
                             }
@@ -2238,8 +2342,7 @@ public class NumberPicker extends LinearLayout {
                         case  AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS: {
                             if (mAccessibilityFocusedView == virtualViewId) {
                                 mAccessibilityFocusedView = UNDEFINED;
-                                sendAccessibilityEventForVirtualView(virtualViewId,
-                                        AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
+                                sendAccessibilityEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
                                 mInputText.invalidate();
                                 return true;
                             }
@@ -2254,26 +2357,31 @@ public class NumberPicker extends LinearLayout {
                         case AccessibilityNodeInfo.ACTION_CLICK: {
                             if (NumberPicker.this.isEnabled()) {
                                 NumberPicker.this.changeValueByOne(true);
-                                sendAccessibilityEventForVirtualView(virtualViewId,
-                                        AccessibilityEvent.TYPE_VIEW_CLICKED);
+                                sendAccessibilityEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED);
                                 return true;
                             }
                         } return false;
                         case AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS: {
                             if (mAccessibilityFocusedView != virtualViewId) {
                                 mAccessibilityFocusedView = virtualViewId;
-                                sendAccessibilityEventForVirtualView(virtualViewId,
-                                        AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
-                                invalidate(0, mBottomSelectionDividerBottom, getRight(), getBottom());
+                                sendAccessibilityEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
+                                if (isHorizontalMode()) {
+                                    invalidate(mRightOfSelectionDividerRight, 0, getRight(), getBottom());
+                                } else {
+                                    invalidate(0, mBottomSelectionDividerBottom, getRight(), getBottom());
+                                }
                                 return true;
                             }
                         } return false;
                         case  AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS: {
                             if (mAccessibilityFocusedView == virtualViewId) {
                                 mAccessibilityFocusedView = UNDEFINED;
-                                sendAccessibilityEventForVirtualView(virtualViewId,
-                                        AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
-                                invalidate(0, mBottomSelectionDividerBottom, getRight(), getBottom());
+                                sendAccessibilityEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
+                                if (isHorizontalMode()) {
+                                    invalidate(mRightOfSelectionDividerRight, 0, getRight(), getBottom());
+                                } else {
+                                    invalidate(0, mBottomSelectionDividerBottom, getRight(), getBottom());
+                                }
                                 return true;
                             }
                         } return false;
@@ -2285,26 +2393,31 @@ public class NumberPicker extends LinearLayout {
                             if (NumberPicker.this.isEnabled()) {
                                 final boolean increment = (virtualViewId == VIRTUAL_VIEW_ID_INCREMENT);
                                 NumberPicker.this.changeValueByOne(increment);
-                                sendAccessibilityEventForVirtualView(virtualViewId,
-                                        AccessibilityEvent.TYPE_VIEW_CLICKED);
+                                sendAccessibilityEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED);
                                 return true;
                             }
                         } return false;
                         case AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS: {
                             if (mAccessibilityFocusedView != virtualViewId) {
                                 mAccessibilityFocusedView = virtualViewId;
-                                sendAccessibilityEventForVirtualView(virtualViewId,
-                                        AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
-                                invalidate(0, 0, getRight(), mTopSelectionDividerTop);
+                                sendAccessibilityEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
+                                if (isHorizontalMode()) {
+                                    invalidate(0, 0, mLeftOfSelectionDividerLeft, getBottom());
+                                } else {
+                                    invalidate(0, 0, getRight(), mTopSelectionDividerTop);
+                                }
                                 return true;
                             }
                         } return false;
                         case  AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS: {
                             if (mAccessibilityFocusedView == virtualViewId) {
                                 mAccessibilityFocusedView = UNDEFINED;
-                                sendAccessibilityEventForVirtualView(virtualViewId,
-                                        AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
-                                invalidate(0, 0, getRight(), mTopSelectionDividerTop);
+                                sendAccessibilityEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
+                                if (isHorizontalMode()) {
+                                    invalidate(0, 0, mLeftOfSelectionDividerLeft, getBottom());
+                                } else {
+                                    invalidate(0, 0, getRight(), mTopSelectionDividerTop);
+                                }
                                 return true;
                             }
                         } return false;
@@ -2316,21 +2429,22 @@ public class NumberPicker extends LinearLayout {
 
         public void sendAccessibilityEventForVirtualView(int virtualViewId, int eventType) {
             switch (virtualViewId) {
-                case VIRTUAL_VIEW_ID_DECREMENT: {
-                    if (hasVirtualDecrementButton()) {
-                        sendAccessibilityEventForVirtualButton(virtualViewId, eventType,
-                                getVirtualDecrementButtonText());
-                    }
-                } break;
-                case VIRTUAL_VIEW_ID_INPUT: {
-                    sendAccessibilityEventForVirtualText(eventType);
-                } break;
-                case VIRTUAL_VIEW_ID_INCREMENT: {
-                    if (hasVirtualIncrementButton()) {
-                        sendAccessibilityEventForVirtualButton(virtualViewId, eventType,
-                                getVirtualIncrementButtonText());
-                    }
-                } break;
+            case VIRTUAL_VIEW_ID_DECREMENT: {
+                if (hasVirtualDecrementButton()) {
+                    sendAccessibilityEventForVirtualButton(virtualViewId, eventType, getVirtualDecrementButtonText());
+                }
+                break;
+            }
+            case VIRTUAL_VIEW_ID_INPUT: {
+                sendAccessibilityEventForVirtualText(eventType);
+                break;
+            }
+            case VIRTUAL_VIEW_ID_INCREMENT: {
+                if (hasVirtualIncrementButton()) {
+                    sendAccessibilityEventForVirtualButton(virtualViewId, eventType, getVirtualIncrementButtonText());
+                }
+                break;
+            }
             }
         }
 
@@ -2344,8 +2458,7 @@ public class NumberPicker extends LinearLayout {
             }
         }
 
-        private void sendAccessibilityEventForVirtualButton(int virtualViewId, int eventType,
-                String text) {
+        private void sendAccessibilityEventForVirtualButton(int virtualViewId, int eventType, String text) {
             if (((AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE)).isEnabled()) {
                 AccessibilityEvent event = AccessibilityEvent.obtain(eventType);
                 event.setClassName(Button.class.getName());
@@ -2357,37 +2470,34 @@ public class NumberPicker extends LinearLayout {
             }
         }
 
-        private void findAccessibilityNodeInfosByTextInChild(String searchedLowerCase,
-                int virtualViewId, List<AccessibilityNodeInfo> outResult) {
+        private void findAccessibilityNodeInfosByTextInChild(String searchedLowerCase, int virtualViewId, List<AccessibilityNodeInfo> outResult) {
             switch (virtualViewId) {
-                case VIRTUAL_VIEW_ID_DECREMENT: {
-                    String text = getVirtualDecrementButtonText();
-                    if (!TextUtils.isEmpty(text)
-                            && text.toString().toLowerCase().contains(searchedLowerCase)) {
-                        outResult.add(createAccessibilityNodeInfo(VIRTUAL_VIEW_ID_DECREMENT));
-                    }
-                } return;
-                case VIRTUAL_VIEW_ID_INPUT: {
-                    CharSequence text = mInputText.getText();
-                    if (!TextUtils.isEmpty(text) &&
-                            text.toString().toLowerCase().contains(searchedLowerCase)) {
-                        outResult.add(createAccessibilityNodeInfo(VIRTUAL_VIEW_ID_INPUT));
-                        return;
-                    }
-                    CharSequence contentDesc = mInputText.getText();
-                    if (!TextUtils.isEmpty(contentDesc) &&
-                            contentDesc.toString().toLowerCase().contains(searchedLowerCase)) {
-                        outResult.add(createAccessibilityNodeInfo(VIRTUAL_VIEW_ID_INPUT));
-                        return;
-                    }
-                } break;
-                case VIRTUAL_VIEW_ID_INCREMENT: {
-                    String text = getVirtualIncrementButtonText();
-                    if (!TextUtils.isEmpty(text)
-                            && text.toString().toLowerCase().contains(searchedLowerCase)) {
-                        outResult.add(createAccessibilityNodeInfo(VIRTUAL_VIEW_ID_INCREMENT));
-                    }
-                } return;
+            case VIRTUAL_VIEW_ID_DECREMENT: {
+                String text = getVirtualDecrementButtonText();
+                if (!TextUtils.isEmpty(text) && text.toString().toLowerCase().contains(searchedLowerCase)) {
+                    outResult.add(createAccessibilityNodeInfo(VIRTUAL_VIEW_ID_DECREMENT));
+                }
+                break;
+            }
+            case VIRTUAL_VIEW_ID_INPUT: {
+                CharSequence text = mInputText.getText();
+                if (!TextUtils.isEmpty(text) && text.toString().toLowerCase().contains(searchedLowerCase)) {
+                    outResult.add(createAccessibilityNodeInfo(VIRTUAL_VIEW_ID_INPUT));
+                    break;
+                }
+                CharSequence contentDesc = mInputText.getText();
+                if (!TextUtils.isEmpty(contentDesc) && contentDesc.toString().toLowerCase().contains(searchedLowerCase)) {
+                    outResult.add(createAccessibilityNodeInfo(VIRTUAL_VIEW_ID_INPUT));
+                    break;
+                }
+            }
+            case VIRTUAL_VIEW_ID_INCREMENT: {
+                String text = getVirtualIncrementButtonText();
+                if (!TextUtils.isEmpty(text) && text.toString().toLowerCase().contains(searchedLowerCase)) {
+                    outResult.add(createAccessibilityNodeInfo(VIRTUAL_VIEW_ID_INCREMENT));
+                }
+                break;
+            }
             }
         }
 
@@ -2404,7 +2514,7 @@ public class NumberPicker extends LinearLayout {
         }
 
         private AccessibilityNodeInfo createAccessibilityNodeInfoForVirtualButton(int virtualViewId,
-                String text, int left, int top, int right, int bottom) {
+            String text, int left, int top, int right, int bottom) {
             AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
             info.setClassName(Button.class.getName());
             info.setPackageName(getContext().getPackageName());
@@ -2437,8 +2547,7 @@ public class NumberPicker extends LinearLayout {
             return info;
         }
 
-        private AccessibilityNodeInfo createAccessibilityNodeInfoForNumberPicker(int left, int top,
-                int right, int bottom) {
+        private AccessibilityNodeInfo createAccessibilityNodeInfoForNumberPicker(int left, int top, int right, int bottom) {
             AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
             info.setClassName(NumberPicker.class.getName());
             info.setPackageName(getContext().getPackageName());
@@ -2611,6 +2720,10 @@ public class NumberPicker extends LinearLayout {
 
     private float pxToSp(float px) {
         return px / getResources().getDisplayMetrics().scaledDensity;
+    }
+
+    private boolean isHorizontalMode() {
+        return mOrientation == HORIZONTAL;
     }
 
 }
