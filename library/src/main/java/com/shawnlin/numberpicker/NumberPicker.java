@@ -38,7 +38,6 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityNodeProvider;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -281,7 +280,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * Cache for the string representation of selector indices.
      */
-    private final SparseArray<String> mSelectorIndexToStringCache = new SparseArray<String>();
+    private final SparseArray<String> mSelectorIndexToStringCache = new SparseArray<>();
 
     /**
      * The selector indices whose value are show by the selector.
@@ -334,15 +333,9 @@ public class NumberPicker extends LinearLayout {
     private SetSelectionCommand mSetSelectionCommand;
 
     /**
-     * Handle to the reusable command for changing the current value from long
-     * press by one.
+     * Handle to the reusable command for changing the current value from long press by one.
      */
     private ChangeCurrentByOneFromLongPressCommand mChangeCurrentByOneFromLongPressCommand;
-
-    /**
-     * Command for beginning an edit of the current value via IME on long press.
-     */
-    private BeginSoftInputOnLongPressCommand mBeginSoftInputOnLongPressCommand;
 
     /**
      * The X position of the last down event.
@@ -408,17 +401,6 @@ public class NumberPicker extends LinearLayout {
      * The current scroll state of the number picker.
      */
     private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
-
-    /**
-     * Flag whether to ignore move events - we ignore such when we show in IME
-     * to prevent the content from scrolling.
-     */
-    private boolean mIngonreMoveEvents;
-
-    /**
-     * Flag whether to show soft input on tap.
-     */
-    private boolean mShowSoftInputOnTap;
 
     /**
      * The top of the top selection divider.
@@ -623,27 +605,24 @@ public class NumberPicker extends LinearLayout {
         });
         mInputText.setImeOptions(EditorInfo.IME_ACTION_NONE);
         mInputText.setTextColor(mTextColor);
-        mInputText.setTypeface(mTypeface != null ? mTypeface : Typeface.MONOSPACE);
-
-        mTextSize = mInputText.getTextSize();
 
         // create the selector wheel paint
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setTextAlign(Align.CENTER);
-        paint.setTextSize(mTextSize);
-        paint.setTypeface(mInputText.getTypeface());
         ColorStateList colors = mInputText.getTextColors();
         int color = colors.getColorForState(ENABLED_STATE_SET, Color.WHITE);
         paint.setColor(color);
         mSelectorWheelPaint = paint;
 
-        setDividerColor(mSelectionDividerColor);
-
+        setTextSize(mTextSize);
+        setTypeface(mTypeface);
         updateInputTextView();
 
         setMaxValue(mMaxValue);
         setMinValue(mMinValue);
+
+        setDividerColor(mSelectionDividerColor);
 
         if (mWidth != SIZE_UNSPECIFIED && mHeight != SIZE_UNSPECIFIED) {
             setScaleX(mWidth / mMinWidth);
@@ -770,8 +749,6 @@ public class NumberPicker extends LinearLayout {
                 mInputText.setVisibility(View.INVISIBLE);
                 if (isHorizontalMode()) {
                     mLastDownOrMoveEventX = mLastDownEventX = event.getX();
-                    mIngonreMoveEvents = false;
-                    mShowSoftInputOnTap = false;
                     // Make sure we support flinging inside scrollables.
                     getParent().requestDisallowInterceptTouchEvent(true);
                     if (!mFlingScroller.isFinished()) {
@@ -782,20 +759,13 @@ public class NumberPicker extends LinearLayout {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
                     } else if (mLastDownEventX < mLeftOfSelectionDividerLeft) {
-                        hideSoftInput();
                         postChangeCurrentByOneFromLongPress(false, ViewConfiguration.getLongPressTimeout());
                     } else if (mLastDownEventX > mRightOfSelectionDividerRight) {
-                        hideSoftInput();
                         postChangeCurrentByOneFromLongPress(true, ViewConfiguration.getLongPressTimeout());
-                    } else {
-                        mShowSoftInputOnTap = true;
-                        postBeginSoftInputOnLongPressCommand();
                     }
                     return true;
                 } else {
                     mLastDownOrMoveEventY = mLastDownEventY = event.getY();
-                    mIngonreMoveEvents = false;
-                    mShowSoftInputOnTap = false;
                     // Make sure we support flinging inside scrollables.
                     getParent().requestDisallowInterceptTouchEvent(true);
                     if (!mFlingScroller.isFinished()) {
@@ -806,14 +776,9 @@ public class NumberPicker extends LinearLayout {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
                     } else if (mLastDownEventX < mLeftOfSelectionDividerLeft) {
-                        hideSoftInput();
                         postChangeCurrentByOneFromLongPress(false, ViewConfiguration.getLongPressTimeout());
                     } else if (mLastDownEventX > mRightOfSelectionDividerRight) {
-                        hideSoftInput();
                         postChangeCurrentByOneFromLongPress(true, ViewConfiguration.getLongPressTimeout());
-                    } else {
-                        mShowSoftInputOnTap = true;
-                        postBeginSoftInputOnLongPressCommand();
                     }
                     return true;
                 }
@@ -834,9 +799,6 @@ public class NumberPicker extends LinearLayout {
         int action = event.getAction() & MotionEvent.ACTION_MASK;
         switch (action) {
             case MotionEvent.ACTION_MOVE: {
-                if (mIngonreMoveEvents) {
-                    break;
-                }
                 if (isHorizontalMode()) {
                     float currentMoveX = event.getX();
                     if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
@@ -869,7 +831,6 @@ public class NumberPicker extends LinearLayout {
             }
             break;
             case MotionEvent.ACTION_UP: {
-                removeBeginSoftInputCommand();
                 removeChangeCurrentByOneFromLongPress();
                 VelocityTracker velocityTracker = mVelocityTracker;
                 velocityTracker.computeCurrentVelocity(1000, mMaximumFlingVelocity);
@@ -882,16 +843,11 @@ public class NumberPicker extends LinearLayout {
                         int eventX = (int) event.getX();
                         int deltaMoveX = (int) Math.abs(eventX - mLastDownEventX);
                         if (deltaMoveX <= mTouchSlop) { // && deltaTime < ViewConfiguration.getTapTimeout()) {
-                            if (mShowSoftInputOnTap) {
-                                mShowSoftInputOnTap = false;
-                                showSoftInput();
-                            } else {
-                                int selectorIndexOffset = (eventX / mSelectorElementSize) - SELECTOR_MIDDLE_ITEM_INDEX;
-                                if (selectorIndexOffset > 0) {
-                                    changeValueByOne(true);
-                                } else if (selectorIndexOffset < 0) {
-                                    changeValueByOne(false);
-                                }
+                            int selectorIndexOffset = (eventX / mSelectorElementSize) - SELECTOR_MIDDLE_ITEM_INDEX;
+                            if (selectorIndexOffset > 0) {
+                                changeValueByOne(true);
+                            } else if (selectorIndexOffset < 0) {
+                                changeValueByOne(false);
                             }
                         } else {
                             ensureScrollWheelAdjusted();
@@ -909,16 +865,11 @@ public class NumberPicker extends LinearLayout {
                         int eventY = (int) event.getY();
                         int deltaMoveY = (int) Math.abs(eventY - mLastDownEventY);
                         if (deltaMoveY <= mTouchSlop) { // && deltaTime < ViewConfiguration.getTapTimeout()) {
-                            if (mShowSoftInputOnTap) {
-                                mShowSoftInputOnTap = false;
-                                showSoftInput();
-                            } else {
-                                int selectorIndexOffset = (eventY / mSelectorElementSize) - SELECTOR_MIDDLE_ITEM_INDEX;
-                                if (selectorIndexOffset > 0) {
-                                    changeValueByOne(true);
-                                } else if (selectorIndexOffset < 0) {
-                                    changeValueByOne(false);
-                                }
+                            int selectorIndexOffset = (eventY / mSelectorElementSize) - SELECTOR_MIDDLE_ITEM_INDEX;
+                            if (selectorIndexOffset > 0) {
+                                changeValueByOne(true);
+                            } else if (selectorIndexOffset < 0) {
+                                changeValueByOne(false);
                             }
                         } else {
                             ensureScrollWheelAdjusted();
@@ -1202,29 +1153,6 @@ public class NumberPicker extends LinearLayout {
      */
     public void setValue(int value) {
         setValueInternal(value, false);
-    }
-
-    /**
-     * Shows the soft input for its input text.
-     */
-    private void showSoftInput() {
-        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (inputMethodManager != null) {
-            mInputText.setVisibility(View.VISIBLE);
-            mInputText.requestFocus();
-            inputMethodManager.showSoftInput(mInputText, 0);
-        }
-    }
-
-    /**
-     * Hides the soft input if it is active for the input text.
-     */
-    private void hideSoftInput() {
-        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (inputMethodManager != null && inputMethodManager.isActive(mInputText)) {
-            inputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
-            mInputText.setVisibility(View.INVISIBLE);
-        }
     }
 
     /**
@@ -1918,28 +1846,6 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Posts a command for beginning an edit of the current value via IME on
-     * long press.
-     */
-    private void postBeginSoftInputOnLongPressCommand() {
-        if (mBeginSoftInputOnLongPressCommand == null) {
-            mBeginSoftInputOnLongPressCommand = new BeginSoftInputOnLongPressCommand();
-        } else {
-            removeCallbacks(mBeginSoftInputOnLongPressCommand);
-        }
-        postDelayed(mBeginSoftInputOnLongPressCommand, ViewConfiguration.getLongPressTimeout());
-    }
-
-    /**
-     * Removes the command for beginning an edit of the current value via IME.
-     */
-    private void removeBeginSoftInputCommand() {
-        if (mBeginSoftInputOnLongPressCommand != null) {
-            removeCallbacks(mBeginSoftInputOnLongPressCommand);
-        }
-    }
-
-    /**
      * Removes all pending callback from the message queue.
      */
     private void removeAllCallbacks() {
@@ -1948,9 +1854,6 @@ public class NumberPicker extends LinearLayout {
         }
         if (mSetSelectionCommand != null) {
             removeCallbacks(mSetSelectionCommand);
-        }
-        if (mBeginSoftInputOnLongPressCommand != null) {
-            removeCallbacks(mBeginSoftInputOnLongPressCommand);
         }
     }
 
@@ -2133,36 +2036,6 @@ public class NumberPicker extends LinearLayout {
         }
     }
 
-    /**
-     * @hide
-     */
-    public static class CustomEditText extends EditText {
-
-        public CustomEditText(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        @Override
-        public void onEditorAction(int actionCode) {
-            super.onEditorAction(actionCode);
-            if (actionCode == EditorInfo.IME_ACTION_DONE) {
-                clearFocus();
-            }
-        }
-    }
-
-    /**
-     * Command for beginning soft input on long press.
-     */
-    class BeginSoftInputOnLongPressCommand implements Runnable {
-
-        @Override
-        public void run() {
-            showSoftInput();
-            mIngonreMoveEvents = true;
-        }
-    }
-
     private SupportAccessibilityNodeProvider getSupportAccessibilityNodeProvider() {
         return new SupportAccessibilityNodeProvider();
     }
@@ -2245,28 +2118,23 @@ public class NumberPicker extends LinearLayout {
         }
 
         @Override
-        public List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(String searched,
-                int virtualViewId) {
+        public List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(String searched, int virtualViewId) {
             if (TextUtils.isEmpty(searched)) {
                 return Collections.emptyList();
             }
             String searchedLowerCase = searched.toLowerCase();
-            List<AccessibilityNodeInfo> result = new ArrayList<AccessibilityNodeInfo>();
+            List<AccessibilityNodeInfo> result = new ArrayList<>();
             switch (virtualViewId) {
                 case View.NO_ID: {
-                    findAccessibilityNodeInfosByTextInChild(searchedLowerCase,
-                            VIRTUAL_VIEW_ID_DECREMENT, result);
-                    findAccessibilityNodeInfosByTextInChild(searchedLowerCase,
-                            VIRTUAL_VIEW_ID_INPUT, result);
-                    findAccessibilityNodeInfosByTextInChild(searchedLowerCase,
-                            VIRTUAL_VIEW_ID_INCREMENT, result);
+                    findAccessibilityNodeInfosByTextInChild(searchedLowerCase, VIRTUAL_VIEW_ID_DECREMENT, result);
+                    findAccessibilityNodeInfosByTextInChild(searchedLowerCase, VIRTUAL_VIEW_ID_INPUT, result);
+                    findAccessibilityNodeInfosByTextInChild(searchedLowerCase, VIRTUAL_VIEW_ID_INCREMENT, result);
                     return result;
                 }
                 case VIRTUAL_VIEW_ID_DECREMENT:
                 case VIRTUAL_VIEW_ID_INCREMENT:
                 case VIRTUAL_VIEW_ID_INPUT: {
-                    findAccessibilityNodeInfosByTextInChild(searchedLowerCase, virtualViewId,
-                            result);
+                    findAccessibilityNodeInfosByTextInChild(searchedLowerCase, virtualViewId, result);
                     return result;
                 }
             }
@@ -2323,18 +2191,10 @@ public class NumberPicker extends LinearLayout {
                             }
                             return false;
                         }
-                        case AccessibilityNodeInfo.ACTION_CLICK: {
-                            if (NumberPicker.this.isEnabled()) {
-                                showSoftInput();
-                                return true;
-                            }
-                            return false;
-                        }
                         case AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS: {
                             if (mAccessibilityFocusedView != virtualViewId) {
                                 mAccessibilityFocusedView = virtualViewId;
-                                sendAccessibilityEventForVirtualView(virtualViewId,
-                                        AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
+                                sendAccessibilityEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
                                 mInputText.invalidate();
                                 return true;
                             }
@@ -2617,7 +2477,7 @@ public class NumberPicker extends LinearLayout {
             }
             if (value >= mMinValue) {
                 return (mDisplayedValues == null) ? formatNumber(value)
-                        : mDisplayedValues[value - mMinValue];
+                    : mDisplayedValues[value - mMinValue];
             }
             return null;
         }
@@ -2629,7 +2489,7 @@ public class NumberPicker extends LinearLayout {
             }
             if (value <= mMaxValue) {
                 return (mDisplayedValues == null) ? formatNumber(value)
-                        : mDisplayedValues[value - mMinValue];
+                    : mDisplayedValues[value - mMinValue];
             }
             return null;
         }
