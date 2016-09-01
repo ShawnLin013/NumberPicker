@@ -170,9 +170,6 @@ public class NumberPicker extends LinearLayout {
 
     private static final TwoDigitFormatter sTwoDigitFormatter = new TwoDigitFormatter();
 
-    /**
-     * @hide
-     */
     public static final Formatter getTwoDigitFormatter() {
         return sTwoDigitFormatter;
     }
