@@ -47,8 +47,8 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
-    app:np_width="64"
-    app:np_height="180"
+    app:np_width="64dp"
+    app:np_height="180dp"
     app:np_dividerColor="@color/colorPrimary"
     app:np_formatter="@string/number_picker_formatter"
     app:np_max="59"
@@ -62,15 +62,18 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 
 |attribute name|attribute description|
 |:-:|:-:|
-|np_dividerColor|The divider color between the numbers |
-|np_formatter|The formatter of the numbers|
-|np_max|The max value of the number picker|
-|np_min|The min value of the number picker|
-|np_textColor|The text color of the numbers|
-|np_textSize|The text size of the numbers|
-|np_typeface|The typeface of the numbers|
-|np_width|The width of the number picker|
-|np_height|The height of the number picker|
+|np_width|The width of this widget.|
+|np_height|The height of this widget.|
+|np_dividerColor|The color of the selection divider.|
+|np_dividerDistance|The distance between the two selection dividers.|
+|np_dividerThickness|The thickness of the selection divider.|
+|np_formatter|The formatter of the numbers.|
+|np_max|The max value of this widget.|
+|np_min|The min value of this widget.|
+|np_orientation|The orientation of this widget. Default is vertical.|
+|np_textColor|The text color of the numbers.|
+|np_textSize|The text size of the numbers.|
+|np_typeface|The typeface of the numbers.|
 
 ## Gradle
 
@@ -84,7 +87,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.shawnlin:number-picker:1.0.1'
+    compile 'com.shawnlin:number-picker:2.0.0'
 }
 ```
 
