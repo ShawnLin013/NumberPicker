@@ -584,6 +584,7 @@ public class NumberPicker extends LinearLayout {
         mTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
         mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, mTextSize);
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
+        mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
         attributesArray.recycle();
 
         // By default Linearlayout that we extend is not drawn. This is
@@ -617,6 +618,7 @@ public class NumberPicker extends LinearLayout {
 
         setTextSize(mTextSize);
         setTypeface(mTypeface);
+        setFormatter(mFormatter);
         updateInputTextView();
 
         setMaxValue(mMaxValue);
@@ -1802,7 +1804,7 @@ public class NumberPicker extends LinearLayout {
          * number.
          */
         String text = (mDisplayedValues == null) ? formatNumber(mValue)
-                : mDisplayedValues[mValue - mMinValue];
+            : mDisplayedValues[mValue - mMinValue];
         if (!TextUtils.isEmpty(text) && !text.equals(mInputText.getText().toString())) {
             mInputText.setText(text);
             return true;
@@ -2513,11 +2515,7 @@ public class NumberPicker extends LinearLayout {
             return;
         }
 
-        setFormatter(new Formatter() {
-            @Override public String format(int i) {
-                return String.format(Locale.getDefault(), formatter, i);
-            }
-        });
+        setFormatter(stringToFormatter(formatter));
     }
 
     public void setFormatter(@StringRes int stringId) {
@@ -2572,6 +2570,19 @@ public class NumberPicker extends LinearLayout {
 
     public void setTypeface(@StringRes int stringId) {
         setTypeface(stringId, Typeface.NORMAL);
+    }
+
+    private Formatter stringToFormatter(final String formatter) {
+        if (TextUtils.isEmpty(formatter)) {
+            return null;
+        }
+
+        return new Formatter() {
+            @Override
+            public String format(int i) {
+                return String.format(Locale.getDefault(), formatter, i);
+            }
+        };
     }
 
     private int dpToPx(float dp) {
