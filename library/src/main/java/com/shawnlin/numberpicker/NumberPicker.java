@@ -1276,9 +1276,9 @@ public class NumberPicker extends LinearLayout {
      * {@link #getMaxValue()} - {@link #getMinValue()} + 1.
      */
     public void setMinValue(int minValue) {
-        if (minValue < 0) {
-            throw new IllegalArgumentException("minValue must be >= 0");
-        }
+//        if (minValue < 0) {
+//            throw new IllegalArgumentException("minValue must be >= 0");
+//        }
         mMinValue = minValue;
         if (mMinValue > mValue) {
             mValue = mMinValue;
