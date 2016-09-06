@@ -5,7 +5,7 @@ It's based on [android.widget.NumberPicker](https://android.googlesource.com/pla
 
 [![Platform](http://img.shields.io/badge/platform-android-brightgreen.svg?style=flat)](http://developer.android.com/index.html) [![Language](http://img.shields.io/badge/language-java-orange.svg?style=flat)](http://www.oracle.com/technetwork/java/javase/downloads/index.html) [![License](http://img.shields.io/badge/license-apache2.0-lightgrey.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-NumberPicker-green.svg?style=true)](https://android-arsenal.com/details/1/3718)
 
-<img src="https://github.com/ShawnLin013/NumberPicker/blob/master/screenshot/NumberPicker-Screenshot.png" width="300">
+<img src="https://github.com/ShawnLin013/NumberPicker/blob/master/screenshot/number-picker-theme.png">
 
 ## Features
 
