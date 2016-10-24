@@ -19,5 +19,6 @@
         <attr name="np_textColor" format="color" />
         <attr name="np_textSize" format="dimension" />
         <attr name="np_typeface" format="string" />
+        <attr name="np_wheel_item_count" format="integer" />
     </declare-styleable>
 </resources>
