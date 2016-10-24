@@ -82,6 +82,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_textColor|The text color of the numbers.|
 |np_textSize|The text size of the numbers.|
 |np_typeface|The typeface of the numbers.|
+|np_wheel_item_count|The number of items show in the selector wheel.|
 
 ## Gradle
 
@@ -95,7 +96,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.shawnlin:number-picker:2.0.1'
+    compile 'com.shawnlin:number-picker:2.1.0'
 }
 ```
 
