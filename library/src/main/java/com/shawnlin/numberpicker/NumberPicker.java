@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
+import android.support.annotation.IntDef;
 import android.support.annotation.StringRes;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -42,16 +43,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import java.lang.annotation.Retention;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 /**
  * A widget that enables the user to select a number form a predefined range.
  */
 public class NumberPicker extends LinearLayout {
+
+    @Retention(SOURCE)
+    @IntDef({VERTICAL, HORIZONTAL})
+    public @interface Orientation{}
+
+    public static final int VERTICAL = LinearLayout.VERTICAL;
+
+    public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
 
     /**
      * The default update interval during long press.
@@ -170,24 +182,19 @@ public class NumberPicker extends LinearLayout {
     private final EditText mInputText;
 
     /**
-     * The distance between the two selection dividers.
-     */
-    private final int mSelectionDividersDistance;
-
-    /**
      * The min height of this widget.
      */
-    private final int mMinHeight;
+    private int mMinHeight;
 
     /**
      * The max height of this widget.
      */
-    private final int mMaxHeight;
+    private int mMaxHeight;
 
     /**
      * The max width of this widget.
      */
-    private final int mMinWidth;
+    private int mMinWidth;
 
     /**
      * The max width of this widget.
@@ -390,9 +397,14 @@ public class NumberPicker extends LinearLayout {
     private int mSelectionDividerColor;
 
     /**
+     * The distance between the two selection dividers.
+     */
+    private int mSelectionDividersDistance;
+
+    /**
      * The thickness of the selection divider.
      */
-    private final int mSelectionDividerThickness;
+    private int mSelectionDividerThickness;
 
     /**
      * The current scroll state of the number picker.
@@ -544,34 +556,24 @@ public class NumberPicker extends LinearLayout {
 
         mSelectionDividerColor = attributesArray.getColor(R.styleable.NumberPicker_np_dividerColor, mSelectionDividerColor);
 
-        final int defSelectionDividerThickness = (int) TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDER_THICKNESS,
-            getResources().getDisplayMetrics());
-        mSelectionDividerThickness = attributesArray.getDimensionPixelSize(
-            R.styleable.NumberPicker_np_dividerThickness, defSelectionDividerThickness);
-
         final int defSelectionDividerDistance = (int) TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDERS_DISTANCE,
             getResources().getDisplayMetrics());
         mSelectionDividersDistance = attributesArray.getDimensionPixelSize(
             R.styleable.NumberPicker_np_dividerDistance, defSelectionDividerDistance);
 
+        final int defSelectionDividerThickness = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDER_THICKNESS,
+                getResources().getDisplayMetrics());
+        mSelectionDividerThickness = attributesArray.getDimensionPixelSize(
+                R.styleable.NumberPicker_np_dividerThickness, defSelectionDividerThickness);
+
         mOrientation = attributesArray.getInt(R.styleable.NumberPicker_np_orientation, VERTICAL);
 
         mWidth = attributesArray.getDimensionPixelSize(R.styleable.NumberPicker_np_width, SIZE_UNSPECIFIED);
         mHeight = attributesArray.getDimensionPixelSize(R.styleable.NumberPicker_np_height, SIZE_UNSPECIFIED);
 
-        if (isHorizontalMode()) {
-            mMinHeight = SIZE_UNSPECIFIED;
-            mMaxHeight = dpToPx(DEFAULT_MIN_WIDTH);
-            mMinWidth = dpToPx(DEFAULT_MAX_HEIGHT);
-            mMaxWidth = SIZE_UNSPECIFIED;
-        } else {
-            mMinHeight = SIZE_UNSPECIFIED;
-            mMaxHeight = dpToPx(DEFAULT_MAX_HEIGHT);
-            mMinWidth = dpToPx(DEFAULT_MIN_WIDTH);
-            mMaxWidth = SIZE_UNSPECIFIED;
-        }
+        setWidthAndHeight();
 
         mComputeMaxWidth = true;
 
@@ -2501,6 +2503,20 @@ public class NumberPicker extends LinearLayout {
         return String.format(Locale.getDefault(), "%d", value);
     }
 
+    private void setWidthAndHeight() {
+        if (isHorizontalMode()) {
+            mMinHeight = SIZE_UNSPECIFIED;
+            mMaxHeight = dpToPx(DEFAULT_MIN_WIDTH);
+            mMinWidth = dpToPx(DEFAULT_MAX_HEIGHT);
+            mMaxWidth = SIZE_UNSPECIFIED;
+        } else {
+            mMinHeight = SIZE_UNSPECIFIED;
+            mMaxHeight = dpToPx(DEFAULT_MAX_HEIGHT);
+            mMinWidth = dpToPx(DEFAULT_MIN_WIDTH);
+            mMaxWidth = SIZE_UNSPECIFIED;
+        }
+    }
+
     public void setDividerColor(@ColorInt int color) {
         mSelectionDividerColor = color;
         mSelectionDivider = new ColorDrawable(color);
@@ -2508,6 +2524,19 @@ public class NumberPicker extends LinearLayout {
 
     public void setDividerColorResource(@ColorRes int colorId) {
         setDividerColor(getResources().getColor(colorId));
+    }
+
+    public void setDividerDistance(int distance) {
+        mSelectionDividersDistance = dpToPx(distance);
+    }
+
+    public void setDividerThickness(int thickness) {
+        mSelectionDividerThickness = dpToPx(thickness);
+    }
+
+    public void setOrientation(@Orientation int orientation) {
+        mOrientation = orientation;
+        setWidthAndHeight();
     }
 
     public void setWheelItemCount(final int count) {
