@@ -1918,7 +1918,9 @@ public class NumberPicker extends LinearLayout {
         '\u0665', '\u0666', '\u0667', '\u0668', '\u0669',
         // Extended Arabic-Indic
         '\u06f0', '\u06f1', '\u06f2', '\u06f3', '\u06f4',
-        '\u06f5', '\u06f6', '\u06f7', '\u06f8', '\u06f9'
+        '\u06f5', '\u06f6', '\u06f7', '\u06f8', '\u06f9',
+        // Negative
+        '-'
     };
 
     /**
