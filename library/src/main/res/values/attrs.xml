@@ -20,5 +20,6 @@
         <attr name="np_textSize" format="dimension" />
         <attr name="np_typeface" format="string" />
         <attr name="np_wheelItemCount" format="integer" />
+        <attr name="np_wrapSelectorWheel" format="boolean" />
     </declare-styleable>
 </resources>

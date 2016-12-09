@@ -585,7 +585,6 @@ public class NumberPicker extends LinearLayout {
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
         mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheelItemCount, mWheelItemCount);
-        attributesArray.recycle();
 
         // By default Linearlayout that we extend is not drawn. This is
         // its draw() method is not called but dispatchDraw() is called
@@ -628,6 +627,9 @@ public class NumberPicker extends LinearLayout {
 
         setWheelItemCount(mWheelItemCount);
 
+        mWrapSelectorWheel = attributesArray.getBoolean(R.styleable.NumberPicker_np_wrapSelectorWheel, mWrapSelectorWheel);
+        setWrapSelectorWheel(mWrapSelectorWheel);
+
         if (mWidth != SIZE_UNSPECIFIED && mHeight != SIZE_UNSPECIFIED) {
             setScaleX(mWidth / mMinWidth);
             setScaleY(mHeight / mMaxHeight);
@@ -655,6 +657,8 @@ public class NumberPicker extends LinearLayout {
                 setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
             }
         }
+
+        attributesArray.recycle();
     }
 
     @Override
@@ -858,8 +862,6 @@ public class NumberPicker extends LinearLayout {
                         }
                         onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
                     }
-                    mVelocityTracker.recycle();
-                    mVelocityTracker = null;
                 } else {
                     int initialVelocity = (int) velocityTracker.getYVelocity();
                     if (Math.abs(initialVelocity) > mMinimumFlingVelocity) {
@@ -880,9 +882,9 @@ public class NumberPicker extends LinearLayout {
                         }
                         onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
                     }
-                    mVelocityTracker.recycle();
-                    mVelocityTracker = null;
                 }
+                mVelocityTracker.recycle();
+                mVelocityTracker = null;
             }
             break;
         }
@@ -1040,51 +1042,51 @@ public class NumberPicker extends LinearLayout {
     @Override
     public void scrollBy(int x, int y) {
         int[] selectorIndices = mSelectorIndices;
-        if (!mWrapSelectorWheel && y > 0
-                && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
-            mCurrentScrollOffset = mInitialScrollOffset;
-            return;
-        }
-        if (!mWrapSelectorWheel && y < 0
-                && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
-            mCurrentScrollOffset = mInitialScrollOffset;
-            return;
-        }
+        int gap;
         if (isHorizontalMode()) {
+            if (!mWrapSelectorWheel && x > 0
+                && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
+                mCurrentScrollOffset = mInitialScrollOffset;
+                return;
+            }
+            if (!mWrapSelectorWheel && x < 0
+                && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
+                mCurrentScrollOffset = mInitialScrollOffset;
+                return;
+            }
+
             mCurrentScrollOffset += x;
-            while (mCurrentScrollOffset - mInitialScrollOffset > mSelectorTextGapWidth) {
-                mCurrentScrollOffset -= mSelectorElementSize;
-                decrementSelectorIndices(selectorIndices);
-                setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
-                if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
-                    mCurrentScrollOffset = mInitialScrollOffset;
-                }
-            }
-            while (mCurrentScrollOffset - mInitialScrollOffset < -mSelectorTextGapWidth) {
-                mCurrentScrollOffset += mSelectorElementSize;
-                incrementSelectorIndices(selectorIndices);
-                setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
-                if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
-                    mCurrentScrollOffset = mInitialScrollOffset;
-                }
-            }
+            gap = mSelectorTextGapWidth;
         } else {
-            mCurrentScrollOffset += y;
-            while (mCurrentScrollOffset - mInitialScrollOffset > mSelectorTextGapHeight) {
-                mCurrentScrollOffset -= mSelectorElementSize;
-                decrementSelectorIndices(selectorIndices);
-                setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
-                if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
-                    mCurrentScrollOffset = mInitialScrollOffset;
-                }
+            if (!mWrapSelectorWheel && y > 0
+                && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
+                mCurrentScrollOffset = mInitialScrollOffset;
+                return;
             }
-            while (mCurrentScrollOffset - mInitialScrollOffset < -mSelectorTextGapHeight) {
-                mCurrentScrollOffset += mSelectorElementSize;
-                incrementSelectorIndices(selectorIndices);
-                setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
-                if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
-                    mCurrentScrollOffset = mInitialScrollOffset;
-                }
+            if (!mWrapSelectorWheel && y < 0
+                && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
+                mCurrentScrollOffset = mInitialScrollOffset;
+                return;
+            }
+
+            mCurrentScrollOffset += y;
+            gap = mSelectorTextGapHeight;
+        }
+
+        while (mCurrentScrollOffset - mInitialScrollOffset > gap) {
+            mCurrentScrollOffset -= mSelectorElementSize;
+            decrementSelectorIndices(selectorIndices);
+            setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
+            if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
+                mCurrentScrollOffset = mInitialScrollOffset;
+            }
+        }
+        while (mCurrentScrollOffset - mInitialScrollOffset < -gap) {
+            mCurrentScrollOffset += mSelectorElementSize;
+            incrementSelectorIndices(selectorIndices);
+            setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
+            if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
+                mCurrentScrollOffset = mInitialScrollOffset;
             }
         }
     }
@@ -1637,17 +1639,16 @@ public class NumberPicker extends LinearLayout {
         initializeSelectorWheelIndices();
         int[] selectorIndices = mSelectorIndices;
         int totalTextSize = selectorIndices.length * (int) mTextSize;
+        float textGapCount = selectorIndices.length;
         int editTextTextPosition;
         if (isHorizontalMode()) {
             float totalTextGapWidth = (getRight() - getLeft()) - totalTextSize;
-            float textGapCount = selectorIndices.length;
             mSelectorTextGapWidth = (int) (totalTextGapWidth / textGapCount + 0.5f);
             mSelectorElementSize = (int) mTextSize + mSelectorTextGapWidth;
             // Ensure that the middle item is positioned the same as the text in mInputText
             editTextTextPosition = mInputText.getRight() / 2;
         } else {
             float totalTextGapHeight = (getBottom() - getTop()) - totalTextSize;
-            float textGapCount = selectorIndices.length;
             mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount + 0.5f);
             mSelectorElementSize = (int) mTextSize + mSelectorTextGapHeight;
             // Ensure that the middle item is positioned the same as the text in mInputText
@@ -1677,10 +1678,8 @@ public class NumberPicker extends LinearLayout {
                 updateInputTextView();
             }
             onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
-        } else {
-            if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                updateInputTextView();
-            }
+        } else if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+            updateInputTextView();
         }
     }
 
@@ -1698,7 +1697,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Flings the selector with the given <code>velocityY</code>.
+     * Flings the selector with the given <code>velocity</code>.
      */
     private void fling(int velocity) {
         if (isHorizontalMode()) {
