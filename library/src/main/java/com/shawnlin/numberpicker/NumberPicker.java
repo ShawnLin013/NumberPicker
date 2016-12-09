@@ -584,7 +584,7 @@ public class NumberPicker extends LinearLayout {
         mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, mTextSize);
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
-        mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheel_item_count, mWheelItemCount);
+        mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheelItemCount, mWheelItemCount);
         attributesArray.recycle();
 
         // By default Linearlayout that we extend is not drawn. This is
