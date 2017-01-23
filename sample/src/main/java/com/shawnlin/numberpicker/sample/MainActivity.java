@@ -2,6 +2,7 @@ package com.shawnlin.numberpicker.sample;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -19,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         NumberPicker numberPicker = (NumberPicker) findViewById(R.id.number_picker);
 
         // set divider color
-        numberPicker.setDividerColor(getResources().getColor(R.color.colorPrimary));
+        numberPicker.setDividerColor(ContextCompat.getColor(this, R.color.colorPrimary));
         numberPicker.setDividerColorResource(R.color.colorPrimary);
 
         // set formatter
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         numberPicker.setFormatter(R.string.number_picker_formatter);
 
         // set text color
-        numberPicker.setTextColor(getResources().getColor(R.color.colorPrimary));
+        numberPicker.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
         numberPicker.setTextColorResource(R.color.colorPrimary);
 
         // set text size
