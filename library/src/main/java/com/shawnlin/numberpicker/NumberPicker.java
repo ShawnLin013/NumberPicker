@@ -18,6 +18,7 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.StringRes;
+import android.support.v4.content.ContextCompat;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
@@ -462,6 +463,11 @@ public class NumberPicker extends LinearLayout {
     private int mOrientation;
 
     /**
+     * The context of this widget.
+     */
+    private Context mContext;
+
+    /**
      * Interface to listen for changes of the current value.
      */
     public interface OnValueChangeListener {
@@ -550,9 +556,11 @@ public class NumberPicker extends LinearLayout {
      */
     public NumberPicker(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs);
+        mContext = context;
+
         TypedArray attributesArray = context.obtainStyledAttributes(attrs, R.styleable.NumberPicker, defStyle, 0);
 
-        mSelectionDivider = getResources().getDrawable(R.drawable.np_numberpicker_selection_divider);
+        mSelectionDivider = ContextCompat.getDrawable(context, R.drawable.np_numberpicker_selection_divider);
 
         mSelectionDividerColor = attributesArray.getColor(R.styleable.NumberPicker_np_dividerColor, mSelectionDividerColor);
 
@@ -593,7 +601,7 @@ public class NumberPicker extends LinearLayout {
         // draw() method to be called. Therefore, we declare we will draw.
         setWillNotDraw(false);
 
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.number_picker_with_selector_wheel, this, true);
 
         // input text
@@ -648,8 +656,8 @@ public class NumberPicker extends LinearLayout {
         mMaximumFlingVelocity = configuration.getScaledMaximumFlingVelocity() / SELECTOR_MAX_FLING_VELOCITY_ADJUSTMENT;
 
         // create the fling and adjust scrollers
-        mFlingScroller = new Scroller(getContext(), null, true);
-        mAdjustScroller = new Scroller(getContext(), new DecelerateInterpolator(2.5f));
+        mFlingScroller = new Scroller(context, null, true);
+        mAdjustScroller = new Scroller(context, new DecelerateInterpolator(2.5f));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             // If not explicitly specified this view is important for accessibility.
@@ -750,6 +758,10 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (!isEnabled()) {
+            return false;
+        }
+
         final int action = event.getAction() & MotionEvent.ACTION_MASK;
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
@@ -783,9 +795,9 @@ public class NumberPicker extends LinearLayout {
                     } else if (!mAdjustScroller.isFinished()) {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
-                    } else if (mLastDownEventX < mLeftOfSelectionDividerLeft) {
+                    } else if (mLastDownEventY < mTopSelectionDividerTop) {
                         postChangeCurrentByOneFromLongPress(false, ViewConfiguration.getLongPressTimeout());
-                    } else if (mLastDownEventX > mRightOfSelectionDividerRight) {
+                    } else if (mLastDownEventY > mBottomSelectionDividerBottom) {
                         postChangeCurrentByOneFromLongPress(true, ViewConfiguration.getLongPressTimeout());
                     }
                     return true;
@@ -951,7 +963,7 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     protected boolean dispatchHoverEvent(MotionEvent event) {
-        if (((AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE)).isEnabled()) {
+        if (((AccessibilityManager) mContext.getSystemService(Context.ACCESSIBILITY_SERVICE)).isEnabled()) {
             final int hoveredVirtualViewId;
             if (isHorizontalMode()) {
                 final int eventX = (int) event.getX();
@@ -2314,7 +2326,7 @@ public class NumberPicker extends LinearLayout {
         }
 
         private void sendAccessibilityEventForVirtualText(int eventType) {
-            if (((AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE)).isEnabled()) {
+            if (((AccessibilityManager) mContext.getSystemService(Context.ACCESSIBILITY_SERVICE)).isEnabled()) {
                 AccessibilityEvent event = AccessibilityEvent.obtain(eventType);
                 mInputText.onInitializeAccessibilityEvent(event);
                 mInputText.onPopulateAccessibilityEvent(event);
@@ -2324,10 +2336,10 @@ public class NumberPicker extends LinearLayout {
         }
 
         private void sendAccessibilityEventForVirtualButton(int virtualViewId, int eventType, String text) {
-            if (((AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE)).isEnabled()) {
+            if (((AccessibilityManager) mContext.getSystemService(Context.ACCESSIBILITY_SERVICE)).isEnabled()) {
                 AccessibilityEvent event = AccessibilityEvent.obtain(eventType);
                 event.setClassName(Button.class.getName());
-                event.setPackageName(getContext().getPackageName());
+                event.setPackageName(mContext.getPackageName());
                 event.getText().add(text);
                 event.setEnabled(NumberPicker.this.isEnabled());
                 event.setSource(NumberPicker.this, virtualViewId);
@@ -2382,7 +2394,7 @@ public class NumberPicker extends LinearLayout {
             String text, int left, int top, int right, int bottom) {
             AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
             info.setClassName(Button.class.getName());
-            info.setPackageName(getContext().getPackageName());
+            info.setPackageName(mContext.getPackageName());
             info.setSource(NumberPicker.this, virtualViewId);
             info.setParent(NumberPicker.this);
             info.setText(text);
@@ -2415,7 +2427,7 @@ public class NumberPicker extends LinearLayout {
         private AccessibilityNodeInfo createAccessibilityNodeInfoForNumberPicker(int left, int top, int right, int bottom) {
             AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
             info.setClassName(NumberPicker.class.getName());
-            info.setPackageName(getContext().getPackageName());
+            info.setPackageName(mContext.getPackageName());
             info.setSource(NumberPicker.this);
 
             if (hasVirtualDecrementButton()) {
@@ -2431,8 +2443,7 @@ public class NumberPicker extends LinearLayout {
             info.setScrollable(true);
 
             /** TODO: Figure out compat implementation for this
-            final float applicationScale =
-                    getContext().getResources().getCompatibilityInfo().applicationScale;
+            final float applicationScale = mContext.getResources().getCompatibilityInfo().applicationScale;
 
             Rect boundsInParent = mTempRect;
             boundsInParent.set(left, top, right, bottom);
@@ -2524,7 +2535,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     public void setDividerColorResource(@ColorRes int colorId) {
-        setDividerColor(getResources().getColor(colorId));
+        setDividerColor(ContextCompat.getColor(mContext, colorId));
     }
 
     public void setDividerDistance(int distance) {
@@ -2565,7 +2576,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     public void setTextColorResource(@ColorRes int colorId) {
-        setTextColor(getResources().getColor(colorId));
+        setTextColor(ContextCompat.getColor(mContext, colorId));
     }
 
     public void setTextSize(float textSize) {
