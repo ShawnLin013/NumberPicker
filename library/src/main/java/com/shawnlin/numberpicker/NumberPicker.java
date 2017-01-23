@@ -2507,13 +2507,13 @@ public class NumberPicker extends LinearLayout {
     private void setWidthAndHeight() {
         if (isHorizontalMode()) {
             mMinHeight = SIZE_UNSPECIFIED;
-            mMaxHeight = dpToPx(DEFAULT_MIN_WIDTH);
-            mMinWidth = dpToPx(DEFAULT_MAX_HEIGHT);
+            mMaxHeight = (int) dpToPx(DEFAULT_MIN_WIDTH);
+            mMinWidth = (int) dpToPx(DEFAULT_MAX_HEIGHT);
             mMaxWidth = SIZE_UNSPECIFIED;
         } else {
             mMinHeight = SIZE_UNSPECIFIED;
-            mMaxHeight = dpToPx(DEFAULT_MAX_HEIGHT);
-            mMinWidth = dpToPx(DEFAULT_MIN_WIDTH);
+            mMaxHeight = (int) dpToPx(DEFAULT_MAX_HEIGHT);
+            mMinWidth = (int) dpToPx(DEFAULT_MIN_WIDTH);
             mMaxWidth = SIZE_UNSPECIFIED;
         }
     }
@@ -2528,11 +2528,11 @@ public class NumberPicker extends LinearLayout {
     }
 
     public void setDividerDistance(int distance) {
-        mSelectionDividersDistance = dpToPx(distance);
+        mSelectionDividersDistance = (int) dpToPx(distance);
     }
 
     public void setDividerThickness(int thickness) {
-        mSelectionDividerThickness = dpToPx(thickness);
+        mSelectionDividerThickness = (int) dpToPx(thickness);
     }
 
     public void setOrientation(@Orientation int orientation) {
@@ -2621,16 +2621,60 @@ public class NumberPicker extends LinearLayout {
         };
     }
 
-    private int dpToPx(float dp) {
-        return (int) (dp * getResources().getDisplayMetrics().density);
+    private float dpToPx(float dp) {
+        return dp * getResources().getDisplayMetrics().density;
+    }
+
+    private float pxToDp(float px) {
+        return px / getResources().getDisplayMetrics().density;
+    }
+
+    private float spToPx(float sp) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, getResources().getDisplayMetrics());
     }
 
     private float pxToSp(float px) {
         return px / getResources().getDisplayMetrics().scaledDensity;
     }
 
-    private boolean isHorizontalMode() {
+    public boolean isHorizontalMode() {
         return mOrientation == HORIZONTAL;
+    }
+
+    public int getDividerColor() {
+        return mSelectionDividerColor;
+    }
+
+    public float getDividerDistance() {
+        return pxToDp(mSelectionDividersDistance);
+    }
+
+    public float getDividerThickness() {
+        return pxToDp(mSelectionDividerThickness);
+    }
+
+    public int getOrientation() {
+        return mOrientation;
+    }
+
+    public int getWheelItemCount() {
+        return mWheelItemCount;
+    }
+
+    public Formatter getFormatter() {
+        return mFormatter;
+    }
+
+    public int getTextColor() {
+        return mTextColor;
+    }
+
+    public float getTextSize() {
+        return spToPx(mTextSize);
+    }
+
+    public Typeface getTypeface() {
+        return mTypeface;
     }
 
 }
