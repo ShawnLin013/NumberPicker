@@ -868,6 +868,8 @@ public class NumberPicker extends LinearLayout {
                                 changeValueByOne(true);
                             } else if (selectorIndexOffset < 0) {
                                 changeValueByOne(false);
+                            } else {
+                                ensureScrollWheelAdjusted();
                             }
                         } else {
                             ensureScrollWheelAdjusted();
@@ -888,6 +890,8 @@ public class NumberPicker extends LinearLayout {
                                 changeValueByOne(true);
                             } else if (selectorIndexOffset < 0) {
                                 changeValueByOne(false);
+                            } else {
+                                ensureScrollWheelAdjusted();
                             }
                         } else {
                             ensureScrollWheelAdjusted();
