@@ -63,7 +63,8 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
     app:np_min="0"
     app:np_textColor="@color/colorPrimary"
     app:np_textSize="@dimen/text_size"
-    app:np_typeface="@string/roboto_light" />
+    app:np_typeface="@string/roboto_light"
+    app:np_value="3" />
 ```
 
 ### Attributes
@@ -82,6 +83,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_textColor|The text color of the numbers.|
 |np_textSize|The text size of the numbers.|
 |np_typeface|The typeface of the numbers.|
+|np_value|The current value of this widget.|
 |np_wheelItemCount|The number of items show in the selector wheel.|
 |np_wrapSelectorWheel|Flag whether the selector should wrap around.|
 

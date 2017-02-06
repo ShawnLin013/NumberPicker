@@ -22,6 +22,7 @@
         app:np_formatter="@string/number_picker_formatter"
         app:np_max="59"
         app:np_min="0"
+        app:np_value="3"
         app:np_textColor="@color/colorPrimary"
         app:np_textSize="@dimen/text_size"
         app:np_typeface="@string/roboto_light" />
