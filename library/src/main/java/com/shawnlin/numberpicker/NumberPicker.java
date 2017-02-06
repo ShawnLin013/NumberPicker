@@ -565,6 +565,7 @@ public class NumberPicker extends LinearLayout {
 
         mComputeMaxWidth = true;
 
+        mValue = attributesArray.getInt(R.styleable.NumberPicker_np_value, mValue);
         mMaxValue = attributesArray.getInt(R.styleable.NumberPicker_np_max, mMaxValue);
         mMinValue = attributesArray.getInt(R.styleable.NumberPicker_np_min, mMinValue);
 
@@ -605,6 +606,7 @@ public class NumberPicker extends LinearLayout {
         setFormatter(mFormatter);
         updateInputTextView();
 
+        setValue(mValue);
         setMaxValue(mMaxValue);
         setMinValue(mMinValue);
 
