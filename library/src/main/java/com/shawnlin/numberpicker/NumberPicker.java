@@ -17,7 +17,6 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
-import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -589,9 +588,6 @@ public class NumberPicker extends LinearLayout {
         mInputText = (EditText) findViewById(R.id.np__numberpicker_input);
         mInputText.setEnabled(false);
         mInputText.setFocusable(false);
-        mInputText.setFilters(new InputFilter[] {
-            new InputTextFilter()
-        });
         mInputText.setImeOptions(EditorInfo.IME_ACTION_NONE);
         mInputText.setTextColor(mTextColor);
 
