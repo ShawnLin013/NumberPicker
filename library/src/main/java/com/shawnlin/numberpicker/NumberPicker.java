@@ -524,7 +524,7 @@ public class NumberPicker extends LinearLayout {
      * @param attrs A collection of attributes.
      */
     public NumberPicker(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.numberPickerStyle);
+        this(context, attrs, 0);
     }
 
     /**
