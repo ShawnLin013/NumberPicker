@@ -1020,7 +1020,7 @@ public class NumberPicker extends LinearLayout {
             mCurrentScrollOffset -= mSelectorElementSize;
             decrementSelectorIndices(selectorIndices);
             setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
-            if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
+            if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] < mMinValue) {
                 mCurrentScrollOffset = mInitialScrollOffset;
             }
         }
@@ -1028,7 +1028,7 @@ public class NumberPicker extends LinearLayout {
             mCurrentScrollOffset += mSelectorElementSize;
             incrementSelectorIndices(selectorIndices);
             setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
-            if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
+            if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] > mMaxValue) {
                 mCurrentScrollOffset = mInitialScrollOffset;
             }
         }
