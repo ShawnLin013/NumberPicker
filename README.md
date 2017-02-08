@@ -3,7 +3,7 @@
 The android library that provides a simple and customizable NumberPicker.
 It's based on [android.widget.NumberPicker](https://android.googlesource.com/platform/frameworks/base/+/47fb191/core/java/android/widget/NumberPicker.java). 
 
-[![Platform](http://img.shields.io/badge/platform-android-brightgreen.svg?style=flat)](http://developer.android.com/index.html) [![Language](http://img.shields.io/badge/language-java-orange.svg?style=flat)](http://www.oracle.com/technetwork/java/javase/downloads/index.html) [![License](http://img.shields.io/badge/license-apache2.0-lightgrey.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-NumberPicker-green.svg?style=true)](https://android-arsenal.com/details/1/3718) [![API](https://img.shields.io/badge/API-15%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=15)
+[![Platform](http://img.shields.io/badge/platform-android-brightgreen.svg?style=flat)](http://developer.android.com/index.html) [![Language](http://img.shields.io/badge/language-java-orange.svg?style=flat)](http://www.oracle.com/technetwork/java/javase/downloads/index.html) [![License](http://img.shields.io/badge/license-apache2.0-lightgrey.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-NumberPicker-green.svg?style=true)](https://android-arsenal.com/details/1/3718) [![API](https://img.shields.io/badge/API-15%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=15) [![Download](https://api.bintray.com/packages/shawnlin013/maven/number-picker/images/download.svg?version=2.4.1)](https://bintray.com/shawnlin013/maven/number-picker/2.4.1/link)
 
 <img src="https://github.com/ShawnLin013/NumberPicker/blob/master/screenshot/number-picker-theme.png">
 
@@ -99,7 +99,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.shawnlin:number-picker:2.4.1'
+    compile 'com.shawnlin:number-picker:2.4.2'
 }
 ```
 
