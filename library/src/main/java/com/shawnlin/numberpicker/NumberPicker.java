@@ -1,10 +1,8 @@
 package com.shawnlin.numberpicker;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Typeface;
@@ -117,6 +115,16 @@ public class NumberPicker extends LinearLayout {
     private static final int DEFAULT_MIN_WIDTH = 64;
 
     /**
+     * The default color of text.
+     */
+    private static final int DEFAULT_TEXT_COLOR = 0xFF000000;
+
+    /**
+     * The default size of text.
+     */
+    private static final float DEFAULT_TEXT_SIZE = 25f;
+
+    /**
      * Use a custom NumberPicker formatting callback to use two-digit minutes
      * strings like "01". Keeping a static formatter etc. is the most efficient
      * way to do this; it avoids creating temporary objects on every call to
@@ -170,7 +178,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * The text for showing the current value.
      */
-    private final EditText mInputText;
+    private final EditText mSelectedText;
 
     /**
      * The min height of this widget.
@@ -198,14 +206,19 @@ public class NumberPicker extends LinearLayout {
     private final boolean mComputeMaxWidth;
 
     /**
+     * The color of the selected text.
+     */
+    private int mSelectedTextColor = DEFAULT_TEXT_COLOR;
+
+    /**
      * The color of the text.
      */
-    private int mTextColor = 0xFF000000;
+    private int mTextColor = DEFAULT_TEXT_COLOR;
 
     /**
      * The size of the text.
      */
-    private float mTextSize = 25f;
+    private float mTextSize = DEFAULT_TEXT_SIZE;
 
     /**
      * The typeface of the text.
@@ -569,8 +582,9 @@ public class NumberPicker extends LinearLayout {
         mMaxValue = attributesArray.getInt(R.styleable.NumberPicker_np_max, mMaxValue);
         mMinValue = attributesArray.getInt(R.styleable.NumberPicker_np_min, mMinValue);
 
+        mSelectedTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_selectedTextColor, mSelectedTextColor);
         mTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
-        mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, mTextSize);
+        mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, spToPx(mTextSize));
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
         mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheelItemCount, mWheelItemCount);
@@ -586,21 +600,19 @@ public class NumberPicker extends LinearLayout {
         inflater.inflate(R.layout.number_picker_with_selector_wheel, this, true);
 
         // input text
-        mInputText = (EditText) findViewById(R.id.np__numberpicker_input);
-        mInputText.setEnabled(false);
-        mInputText.setFocusable(false);
-        mInputText.setImeOptions(EditorInfo.IME_ACTION_NONE);
-        mInputText.setTextColor(mTextColor);
+        mSelectedText = (EditText) findViewById(R.id.np__numberpicker_input);
+        mSelectedText.setEnabled(false);
+        mSelectedText.setFocusable(false);
+        mSelectedText.setImeOptions(EditorInfo.IME_ACTION_NONE);
 
         // create the selector wheel paint
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setTextAlign(Align.CENTER);
-        ColorStateList colors = mInputText.getTextColors();
-        int color = colors.getColorForState(ENABLED_STATE_SET, Color.WHITE);
-        paint.setColor(color);
         mSelectorWheelPaint = paint;
 
+        setSelectedTextColor(mSelectedTextColor);
+        setTextColor(mTextColor);
         setTextSize(mTextSize);
         setTypeface(mTypeface);
         setFormatter(mFormatter);
@@ -654,13 +666,13 @@ public class NumberPicker extends LinearLayout {
         final int msrdHght = getMeasuredHeight();
 
         // Input text centered horizontally.
-        final int inptTxtMsrdWdth = mInputText.getMeasuredWidth();
-        final int inptTxtMsrdHght = mInputText.getMeasuredHeight();
+        final int inptTxtMsrdWdth = mSelectedText.getMeasuredWidth();
+        final int inptTxtMsrdHght = mSelectedText.getMeasuredHeight();
         final int inptTxtLeft = (msrdWdth - inptTxtMsrdWdth) / 2;
         final int inptTxtTop = (msrdHght - inptTxtMsrdHght) / 2;
         final int inptTxtRight = inptTxtLeft + inptTxtMsrdWdth;
         final int inptTxtBottom = inptTxtTop + inptTxtMsrdHght;
-        mInputText.layout(inptTxtLeft, inptTxtTop, inptTxtRight, inptTxtBottom);
+        mSelectedText.layout(inptTxtLeft, inptTxtTop, inptTxtRight, inptTxtBottom);
 
         if (changed) {
             // need to do all this when we know our size
@@ -745,7 +757,7 @@ public class NumberPicker extends LinearLayout {
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
                 removeAllCallbacks();
-                mInputText.setVisibility(View.INVISIBLE);
+                mSelectedText.setVisibility(View.INVISIBLE);
                 if (isHorizontalMode()) {
                     mLastDownOrMoveEventX = mLastDownEventX = event.getX();
                     // Make sure we support flinging inside scrollables.
@@ -979,7 +991,7 @@ public class NumberPicker extends LinearLayout {
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        mInputText.setEnabled(enabled);
+        mSelectedText.setEnabled(enabled);
     }
 
     @Override
@@ -1136,7 +1148,7 @@ public class NumberPicker extends LinearLayout {
                 }
             }
         }
-        maxTextWidth += mInputText.getPaddingLeft() + mInputText.getPaddingRight();
+        maxTextWidth += mSelectedText.getPaddingLeft() + mSelectedText.getPaddingRight();
         if (mMaxWidth != maxTextWidth) {
             if (maxTextWidth > mMinWidth) {
                 mMaxWidth = maxTextWidth;
@@ -1302,10 +1314,10 @@ public class NumberPicker extends LinearLayout {
         mDisplayedValues = displayedValues;
         if (mDisplayedValues != null) {
             // Allow text entry rather than strictly numeric entry.
-            mInputText.setRawInputType(InputType.TYPE_CLASS_TEXT
+            mSelectedText.setRawInputType(InputType.TYPE_CLASS_TEXT
                     | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         } else {
-            mInputText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+            mSelectedText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
         }
         updateInputTextView();
         initializeSelectorWheelIndices();
@@ -1343,7 +1355,7 @@ public class NumberPicker extends LinearLayout {
         float x, y;
         if (isHorizontalMode()) {
             x = mCurrentScrollOffset;
-            y = mInputText.getBaseline() + mInputText.getTop();
+            y = mSelectedText.getBaseline() + mSelectedText.getTop();
         } else {
             x = (getRight() - getLeft()) / 2;
             y = mCurrentScrollOffset;
@@ -1352,6 +1364,12 @@ public class NumberPicker extends LinearLayout {
         // draw the selector wheel
         int[] selectorIndices = mSelectorIndices;
         for (int i = 0; i < selectorIndices.length; i++) {
+            if (i == mWheelMiddleItemIndex) {
+                mSelectorWheelPaint.setColor(mSelectedTextColor);
+            } else {
+                mSelectorWheelPaint.setColor(mTextColor);
+            }
+
             int selectorIndex = selectorIndices[i];
             String scrollSelectorValue = mSelectorIndexToStringCache.get(selectorIndex);
             // Do not draw the middle item if input is visible since the input
@@ -1359,7 +1377,7 @@ public class NumberPicker extends LinearLayout {
             // item. Otherwise, if the user starts editing the text via the
             // IME he may see a dimmed version of the old value intermixed
             // with the new one.
-            if (i != mWheelMiddleItemIndex || mInputText.getVisibility() != VISIBLE) {
+            if (i != mWheelMiddleItemIndex || mSelectedText.getVisibility() != VISIBLE) {
                 canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaint);
             }
 
@@ -1548,7 +1566,7 @@ public class NumberPicker extends LinearLayout {
      * @param increment True to increment, false to decrement.
      */
     private void changeValueByOne(boolean increment) {
-        mInputText.setVisibility(View.INVISIBLE);
+        mSelectedText.setVisibility(View.INVISIBLE);
         if (!moveToFinalScrollerPosition(mFlingScroller)) {
             moveToFinalScrollerPosition(mAdjustScroller);
         }
@@ -1580,14 +1598,14 @@ public class NumberPicker extends LinearLayout {
             float totalTextGapWidth = (getRight() - getLeft()) - totalTextSize;
             mSelectorTextGapWidth = (int) (totalTextGapWidth / textGapCount + 0.5f);
             mSelectorElementSize = (int) mTextSize + mSelectorTextGapWidth;
-            // Ensure that the middle item is positioned the same as the text in mInputText
-            editTextTextPosition = mInputText.getRight() / 2;
+            // Ensure that the middle item is positioned the same as the text in mSelectedText
+            editTextTextPosition = mSelectedText.getRight() / 2;
         } else {
             float totalTextGapHeight = (getBottom() - getTop()) - totalTextSize;
             mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount + 0.5f);
             mSelectorElementSize = (int) mTextSize + mSelectorTextGapHeight;
-            // Ensure that the middle item is positioned the same as the text in mInputText
-            editTextTextPosition = mInputText.getBaseline() + mInputText.getTop();
+            // Ensure that the middle item is positioned the same as the text in mSelectedText
+            editTextTextPosition = mSelectedText.getBaseline() + mSelectedText.getTop();
         }
         mInitialScrollOffset = editTextTextPosition - (mSelectorElementSize * mWheelMiddleItemIndex);
         mCurrentScrollOffset = mInitialScrollOffset;
@@ -1741,8 +1759,8 @@ public class NumberPicker extends LinearLayout {
          */
         String text = (mDisplayedValues == null) ? formatNumber(mValue)
             : mDisplayedValues[mValue - mMinValue];
-        if (!TextUtils.isEmpty(text) && !text.equals(mInputText.getText().toString())) {
-            mInputText.setText(text);
+        if (!TextUtils.isEmpty(text) && !text.equals(mSelectedText.getText().toString())) {
+            mSelectedText.setText(text);
             return true;
         }
 
@@ -1955,7 +1973,7 @@ public class NumberPicker extends LinearLayout {
         private int mSelectionEnd;
 
         public void run() {
-            mInputText.setSelection(mSelectionStart, mSelectionEnd);
+            mSelectedText.setSelection(mSelectionStart, mSelectionEnd);
         }
     }
 
@@ -2034,10 +2052,18 @@ public class NumberPicker extends LinearLayout {
         setFormatter(getResources().getString(stringId));
     }
 
+    public void setSelectedTextColor(@ColorInt int color) {
+        mSelectedTextColor = color;
+        mSelectedText.setTextColor(mSelectedTextColor);
+    }
+
+    public void setSelectedTextColorResource(@ColorRes int colorId) {
+        setSelectedTextColor(ContextCompat.getColor(mContext, colorId));
+    }
+
     public void setTextColor(@ColorInt int color) {
         mTextColor = color;
-        mInputText.setTextColor(color);
-        mSelectorWheelPaint.setColor(color);
+        mSelectorWheelPaint.setColor(mTextColor);
     }
 
     public void setTextColorResource(@ColorRes int colorId) {
@@ -2046,7 +2072,7 @@ public class NumberPicker extends LinearLayout {
 
     public void setTextSize(float textSize) {
         mTextSize = textSize;
-        mInputText.setTextSize(pxToSp(mTextSize));
+        mSelectedText.setTextSize(pxToSp(mTextSize));
         mSelectorWheelPaint.setTextSize(mTextSize);
     }
 
@@ -2057,10 +2083,10 @@ public class NumberPicker extends LinearLayout {
     public void setTypeface(Typeface typeface) {
         mTypeface = typeface;
         if (mTypeface != null) {
-            mInputText.setTypeface(mTypeface);
+            mSelectedText.setTypeface(mTypeface);
             mSelectorWheelPaint.setTypeface(mTypeface);
         } else {
-            mInputText.setTypeface(Typeface.MONOSPACE);
+            mSelectedText.setTypeface(Typeface.MONOSPACE);
             mSelectorWheelPaint.setTypeface(Typeface.MONOSPACE);
         }
     }
@@ -2139,6 +2165,10 @@ public class NumberPicker extends LinearLayout {
 
     public Formatter getFormatter() {
         return mFormatter;
+    }
+
+    public int getSelectedTextColor() {
+        return mSelectedTextColor;
     }
 
     public int getTextColor() {
