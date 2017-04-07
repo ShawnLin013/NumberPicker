@@ -22,16 +22,20 @@ It's based on [android.widget.NumberPicker](https://android.googlesource.com/pla
 NumberPicker numberPicker = (NumberPicker) findViewById(R.id.number_picker);
 
 // set divider color
-numberPicker.setDividerColor(getResources().getColor(R.color.colorPrimary));
+numberPicker.setDividerColor(ContextCompat.getColor(this, R.color.colorPrimary));
 numberPicker.setDividerColorResource(R.color.colorPrimary);
 
 // set formatter
 numberPicker.setFormatter(getString(R.string.number_picker_formatter));
 numberPicker.setFormatter(R.string.number_picker_formatter);
 
+// set selected text color
+numberPicker.setSelectedTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+numberPicker.setSelectedTextColorResource(R.color.colorPrimary);
+
 // set text color
-numberPicker.setTextColor(getResources().getColor(R.color.colorPrimary));
-numberPicker.setTextColorResource(R.color.colorPrimary);
+numberPicker.setTextColor(ContextCompat.getColor(this, R.color.dark_grey));
+numberPicker.setTextColorResource(R.color.dark_grey);
 
 // set text size
 numberPicker.setTextSize(getResources().getDimension(R.dimen.text_size));
@@ -61,6 +65,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
     app:np_formatter="@string/number_picker_formatter"
     app:np_max="59"
     app:np_min="0"
+    app:np_selectedTextColor="@color/colorPrimary"
     app:np_textColor="@color/colorPrimary"
     app:np_textSize="@dimen/text_size"
     app:np_typeface="@string/roboto_light"
@@ -80,6 +85,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_max|The max value of this widget.|
 |np_min|The min value of this widget.|
 |np_orientation|The orientation of this widget. Default is vertical.|
+|np_selectedTextColor|The text color of the selected number.|
 |np_textColor|The text color of the numbers.|
 |np_textSize|The text size of the numbers.|
 |np_typeface|The typeface of the numbers.|
@@ -99,7 +105,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.shawnlin:number-picker:2.4.2'
+    compile 'com.shawnlin:number-picker:2.4.3'
 }
 ```
 

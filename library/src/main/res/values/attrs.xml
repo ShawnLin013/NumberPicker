@@ -16,6 +16,7 @@
             <enum name="horizontal" value="0" />
             <enum name="vertical" value="1" />
         </attr>
+        <attr name="np_selectedTextColor" format="color" />
         <attr name="np_textColor" format="color" />
         <attr name="np_textSize" format="dimension" />
         <attr name="np_typeface" format="string" />
