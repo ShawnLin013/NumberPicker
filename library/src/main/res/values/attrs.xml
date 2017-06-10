@@ -19,6 +19,7 @@
         <attr name="np_selectedTextColor" format="color" />
         <attr name="np_textColor" format="color" />
         <attr name="np_textSize" format="dimension" />
+        <attr name="np_selectedTextSize" format="dimension" />
         <attr name="np_typeface" format="string" />
         <attr name="np_value" format="integer" />
         <attr name="np_wheelItemCount" format="integer" />
