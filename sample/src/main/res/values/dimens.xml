@@ -6,5 +6,4 @@
 
     <dimen name="text_size">30dp</dimen>
     <dimen name="selected_text_size">35dp</dimen>
-
 </resources>

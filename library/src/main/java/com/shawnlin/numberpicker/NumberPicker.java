@@ -591,7 +591,6 @@ public class NumberPicker extends LinearLayout {
         mTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
         mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, spToPx(mTextSize));
         mSelectedTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_selectedTextSize, spToPx(mSelectedTextSize));
-
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
         mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheelItemCount, mWheelItemCount);
