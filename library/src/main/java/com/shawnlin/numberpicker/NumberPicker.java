@@ -51,8 +51,14 @@ public class NumberPicker extends LinearLayout {
     public @interface Orientation{}
 
     public static final int VERTICAL = LinearLayout.VERTICAL;
-
     public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
+
+    @Retention(SOURCE)
+    @IntDef({ASCENDING, DESCENDING})
+    public @interface Order{}
+
+    public static final int ASCENDING = 0;
+    public static final int DESCENDING = 1;
 
     /**
      * The default update interval during long press.
@@ -93,6 +99,11 @@ public class NumberPicker extends LinearLayout {
      * Constant for unspecified size.
      */
     private static final int SIZE_UNSPECIFIED = -1;
+
+    /**
+     * The default color of divider.
+     */
+    private static final int DEFAULT_DIVIDER_COLOR = 0xFF000000;
 
     /**
      * The default max value of this widget.
@@ -403,7 +414,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * The color of the selection divider.
      */
-    private int mSelectionDividerColor;
+    private int mSelectionDividerColor = DEFAULT_DIVIDER_COLOR;
 
     /**
      * The distance between the two selection dividers.
@@ -459,6 +470,11 @@ public class NumberPicker extends LinearLayout {
      * The orientation of this widget.
      */
     private int mOrientation;
+
+    /**
+     * The order of this widget.
+     */
+    private int mOrder;
 
     /**
      * The context of this widget.
@@ -574,6 +590,7 @@ public class NumberPicker extends LinearLayout {
         mSelectionDividerThickness = attributesArray.getDimensionPixelSize(
                 R.styleable.NumberPicker_np_dividerThickness, defSelectionDividerThickness);
 
+        mOrder = attributesArray.getInt(R.styleable.NumberPicker_np_order, ASCENDING);
         mOrientation = attributesArray.getInt(R.styleable.NumberPicker_np_orientation, VERTICAL);
 
         mWidth = attributesArray.getDimensionPixelSize(R.styleable.NumberPicker_np_width, SIZE_UNSPECIFIED);
@@ -588,9 +605,9 @@ public class NumberPicker extends LinearLayout {
         mMinValue = attributesArray.getInt(R.styleable.NumberPicker_np_min, mMinValue);
 
         mSelectedTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_selectedTextColor, mSelectedTextColor);
+        mSelectedTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_selectedTextSize, spToPx(mSelectedTextSize));
         mTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
         mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, spToPx(mTextSize));
-        mSelectedTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_selectedTextSize, spToPx(mSelectedTextSize));
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
         mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheelItemCount, mWheelItemCount);
@@ -1003,32 +1020,58 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     public void scrollBy(int x, int y) {
-        int[] selectorIndices = mSelectorIndices;
+        int[] selectorIndices = getSelectorIndices();
         int gap;
         if (isHorizontalMode()) {
-            if (!mWrapSelectorWheel && x > 0
-                && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
-                mCurrentScrollOffset = mInitialScrollOffset;
-                return;
-            }
-            if (!mWrapSelectorWheel && x < 0
-                && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
-                mCurrentScrollOffset = mInitialScrollOffset;
-                return;
+            if (isAscendingOrder()) {
+                if (!mWrapSelectorWheel && x > 0
+                    && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                    return;
+                }
+                if (!mWrapSelectorWheel && x < 0
+                    && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                    return;
+                }
+            } else {
+                if (!mWrapSelectorWheel && x > 0
+                    && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                    return;
+                }
+                if (!mWrapSelectorWheel && x < 0
+                    && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                    return;
+                }
             }
 
             mCurrentScrollOffset += x;
             gap = mSelectorTextGapWidth;
         } else {
-            if (!mWrapSelectorWheel && y > 0
-                && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
-                mCurrentScrollOffset = mInitialScrollOffset;
-                return;
-            }
-            if (!mWrapSelectorWheel && y < 0
-                && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
-                mCurrentScrollOffset = mInitialScrollOffset;
-                return;
+            if (isAscendingOrder()) {
+                if (!mWrapSelectorWheel && y > 0
+                    && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                    return;
+                }
+                if (!mWrapSelectorWheel && y < 0
+                    && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                    return;
+                }
+            } else {
+                if (!mWrapSelectorWheel && y > 0
+                    && selectorIndices[mWheelMiddleItemIndex] >= mMaxValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                    return;
+                }
+                if (!mWrapSelectorWheel && y < 0
+                    && selectorIndices[mWheelMiddleItemIndex] <= mMinValue) {
+                    mCurrentScrollOffset = mInitialScrollOffset;
+                    return;
+                }
             }
 
             mCurrentScrollOffset += y;
@@ -1037,7 +1080,11 @@ public class NumberPicker extends LinearLayout {
 
         while (mCurrentScrollOffset - mInitialScrollOffset > gap) {
             mCurrentScrollOffset -= mSelectorElementSize;
-            decrementSelectorIndices(selectorIndices);
+            if (isAscendingOrder()) {
+                decrementSelectorIndices(selectorIndices);
+            } else {
+                incrementSelectorIndices(selectorIndices);
+            }
             setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
             if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] < mMinValue) {
                 mCurrentScrollOffset = mInitialScrollOffset;
@@ -1045,7 +1092,11 @@ public class NumberPicker extends LinearLayout {
         }
         while (mCurrentScrollOffset - mInitialScrollOffset < -gap) {
             mCurrentScrollOffset += mSelectorElementSize;
-            incrementSelectorIndices(selectorIndices);
+            if (isAscendingOrder()) {
+                incrementSelectorIndices(selectorIndices);
+            } else {
+                decrementSelectorIndices(selectorIndices);
+            }
             setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
             if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] > mMaxValue) {
                 mCurrentScrollOffset = mInitialScrollOffset;
@@ -1369,7 +1420,7 @@ public class NumberPicker extends LinearLayout {
         }
 
         // draw the selector wheel
-        int[] selectorIndices = mSelectorIndices;
+        int[] selectorIndices = getSelectorIndices();
         for (int i = 0; i < selectorIndices.length; i++) {
             if (i == mWheelMiddleItemIndex) {
                 mSelectorWheelPaint.setTextSize(mSelectedTextSize);
@@ -1379,7 +1430,7 @@ public class NumberPicker extends LinearLayout {
                 mSelectorWheelPaint.setColor(mTextColor);
             }
 
-            int selectorIndex = selectorIndices[i];
+            int selectorIndex = selectorIndices[isAscendingOrder() ? i : selectorIndices.length - i - 1];
             String scrollSelectorValue = mSelectorIndexToStringCache.get(selectorIndex);
             // Do not draw the middle item if input is visible since the input
             // is shown only if the wheel is static and it covers the middle
@@ -1528,7 +1579,7 @@ public class NumberPicker extends LinearLayout {
      */
     private void initializeSelectorWheelIndices() {
         mSelectorIndexToStringCache.clear();
-        int[] selectorIndices = mSelectorIndices;
+        int[] selectorIndices = getSelectorIndices();
         int current = getValue();
         for (int i = 0; i < mSelectorIndices.length; i++) {
             int selectorIndex = current + (i - mWheelMiddleItemIndex);
@@ -1599,7 +1650,7 @@ public class NumberPicker extends LinearLayout {
 
     private void initializeSelectorWheel() {
         initializeSelectorWheelIndices();
-        int[] selectorIndices = mSelectorIndices;
+        int[] selectorIndices = getSelectorIndices();
         int totalTextSize = selectorIndices.length * (int) mTextSize;
         float textGapCount = selectorIndices.length;
         int editTextTextPosition;
@@ -1691,6 +1742,10 @@ public class NumberPicker extends LinearLayout {
             return mMaxValue - (mMinValue - selectorIndex) % (mMaxValue - mMinValue) + 1;
         }
         return selectorIndex;
+    }
+
+    private int[] getSelectorIndices() {
+        return mSelectorIndices;
     }
 
     /**
@@ -2038,6 +2093,15 @@ public class NumberPicker extends LinearLayout {
         mSelectionDividerThickness = (int) dpToPx(thickness);
     }
 
+    /**
+     * Should sort numbers in ascending or descending order.
+     * @param order Pass {@link #ASCENDING} or {@link #ASCENDING}.
+     * Default value is {@link #DESCENDING}.
+     */
+    public void setOrder(@Order int order) {
+        mOrder = order;
+    }
+
     public void setOrientation(@Orientation int orientation) {
         mOrientation = orientation;
         setWidthAndHeight();
@@ -2070,6 +2134,15 @@ public class NumberPicker extends LinearLayout {
         setSelectedTextColor(ContextCompat.getColor(mContext, colorId));
     }
 
+    public void setSelectedTextSize(float textSize) {
+        mSelectedTextSize = textSize;
+        mSelectedText.setTextSize(pxToSp(mSelectedTextSize));
+    }
+
+    public void setSelectedTextSize(@DimenRes int dimenId) {
+        setSelectedTextSize(getResources().getDimension(dimenId));
+    }
+
     public void setTextColor(@ColorInt int color) {
         mTextColor = color;
         mSelectorWheelPaint.setColor(mTextColor);
@@ -2087,14 +2160,7 @@ public class NumberPicker extends LinearLayout {
     public void setTextSize(@DimenRes int dimenId) {
         setTextSize(getResources().getDimension(dimenId));
     }
-    public void setSelectedTextSize(float textSize) {
-        mSelectedTextSize = textSize;
-        mSelectedText.setTextSize(pxToSp(mSelectedTextSize));
-    }
 
-    public void setSelectedTextSize(@DimenRes int dimenId) {
-        setSelectedTextSize(getResources().getDimension(dimenId));
-    }
     public void setTypeface(Typeface typeface) {
         mTypeface = typeface;
         if (mTypeface != null) {
@@ -2155,7 +2221,11 @@ public class NumberPicker extends LinearLayout {
     }
 
     public boolean isHorizontalMode() {
-        return mOrientation == HORIZONTAL;
+        return getOrientation() == HORIZONTAL;
+    }
+
+    public boolean isAscendingOrder() {
+        return getOrder() == ASCENDING;
     }
 
     public int getDividerColor() {
@@ -2168,6 +2238,10 @@ public class NumberPicker extends LinearLayout {
 
     public float getDividerThickness() {
         return pxToDp(mSelectionDividerThickness);
+    }
+
+    public int getOrder() {
+        return mOrder;
     }
 
     public int getOrientation() {
@@ -2186,6 +2260,10 @@ public class NumberPicker extends LinearLayout {
         return mSelectedTextColor;
     }
 
+    public float getSelectedTextSize() {
+        return mSelectedTextSize;
+    }
+
     public int getTextColor() {
         return mTextColor;
     }
@@ -2198,7 +2276,4 @@ public class NumberPicker extends LinearLayout {
         return mTypeface;
     }
 
-    public float getmSelectedTextSize() {
-        return mSelectedTextSize;
-    }
 }

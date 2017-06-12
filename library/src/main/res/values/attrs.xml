@@ -12,14 +12,18 @@
         <attr name="np_formatter" format="string" />
         <attr name="np_max" format="integer" />
         <attr name="np_min" format="integer" />
+        <attr name="np_order" format="enum">
+            <enum name="ascending" value="0" />
+            <enum name="descending" value="1" />
+        </attr>
         <attr name="np_orientation" format="enum">
             <enum name="horizontal" value="0" />
             <enum name="vertical" value="1" />
         </attr>
         <attr name="np_selectedTextColor" format="color" />
+        <attr name="np_selectedTextSize" format="dimension" />
         <attr name="np_textColor" format="color" />
         <attr name="np_textSize" format="dimension" />
-        <attr name="np_selectedTextSize" format="dimension" />
         <attr name="np_typeface" format="string" />
         <attr name="np_value" format="integer" />
         <attr name="np_wheelItemCount" format="integer" />

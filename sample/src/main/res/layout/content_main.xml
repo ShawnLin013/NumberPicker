@@ -31,11 +31,13 @@
         app:np_dividerColor="@color/colorAccent"
         app:np_max="10"
         app:np_min="0"
+        app:np_order="descending"
         app:np_orientation="horizontal"
         app:np_selectedTextColor="@color/colorAccent"
         app:np_textColor="@color/colorAccent"
         app:np_textSize="@dimen/text_size"
         app:np_selectedTextSize="@dimen/selected_text_size"
-        app:np_typeface="@string/roboto_light" />
+        app:np_typeface="@string/roboto_light"
+        app:np_wrapSelectorWheel="true" />
 
 </RelativeLayout>
