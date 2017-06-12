@@ -35,6 +35,7 @@
         app:np_selectedTextColor="@color/colorAccent"
         app:np_textColor="@color/colorAccent"
         app:np_textSize="@dimen/text_size"
+        app:np_selectedTextSize="@dimen/selected_text_size"
         app:np_typeface="@string/roboto_light" />
 
 </RelativeLayout>

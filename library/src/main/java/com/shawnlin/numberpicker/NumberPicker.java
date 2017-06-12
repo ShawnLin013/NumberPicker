@@ -221,6 +221,11 @@ public class NumberPicker extends LinearLayout {
     private float mTextSize = DEFAULT_TEXT_SIZE;
 
     /**
+     * The size of the selected text.
+     */
+    private float mSelectedTextSize = DEFAULT_TEXT_SIZE;
+
+    /**
      * The typeface of the text.
      */
     private Typeface mTypeface;
@@ -585,6 +590,7 @@ public class NumberPicker extends LinearLayout {
         mSelectedTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_selectedTextColor, mSelectedTextColor);
         mTextColor = attributesArray.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
         mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, spToPx(mTextSize));
+        mSelectedTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_selectedTextSize, spToPx(mSelectedTextSize));
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
         mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheelItemCount, mWheelItemCount);
@@ -614,6 +620,7 @@ public class NumberPicker extends LinearLayout {
         setSelectedTextColor(mSelectedTextColor);
         setTextColor(mTextColor);
         setTextSize(mTextSize);
+        setSelectedTextSize(mSelectedTextSize);
         setTypeface(mTypeface);
         setFormatter(mFormatter);
         updateInputTextView();
@@ -1365,8 +1372,10 @@ public class NumberPicker extends LinearLayout {
         int[] selectorIndices = mSelectorIndices;
         for (int i = 0; i < selectorIndices.length; i++) {
             if (i == mWheelMiddleItemIndex) {
+                mSelectorWheelPaint.setTextSize(mSelectedTextSize);
                 mSelectorWheelPaint.setColor(mSelectedTextColor);
             } else {
+                mSelectorWheelPaint.setTextSize(mTextSize);
                 mSelectorWheelPaint.setColor(mTextColor);
             }
 
@@ -2072,14 +2081,20 @@ public class NumberPicker extends LinearLayout {
 
     public void setTextSize(float textSize) {
         mTextSize = textSize;
-        mSelectedText.setTextSize(pxToSp(mTextSize));
         mSelectorWheelPaint.setTextSize(mTextSize);
     }
 
     public void setTextSize(@DimenRes int dimenId) {
         setTextSize(getResources().getDimension(dimenId));
     }
+    public void setSelectedTextSize(float textSize) {
+        mSelectedTextSize = textSize;
+        mSelectedText.setTextSize(pxToSp(mSelectedTextSize));
+    }
 
+    public void setSelectedTextSize(@DimenRes int dimenId) {
+        setSelectedTextSize(getResources().getDimension(dimenId));
+    }
     public void setTypeface(Typeface typeface) {
         mTypeface = typeface;
         if (mTypeface != null) {
@@ -2183,4 +2198,7 @@ public class NumberPicker extends LinearLayout {
         return mTypeface;
     }
 
+    public float getmSelectedTextSize() {
+        return mSelectedTextSize;
+    }
 }
