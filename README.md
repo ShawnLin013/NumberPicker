@@ -12,6 +12,7 @@ It's based on [android.widget.NumberPicker](https://android.googlesource.com/pla
 - Customizable fonts(color, size, typeface)
 - Customizable dividers(color, distance, thickness)
 - Horizontal and Vertical mode are both supported
+- Ascending and Descending order are both supported
 - Also supports the negative values
 
 ## Usage
@@ -70,9 +71,9 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
     app:np_max="59"
     app:np_min="0"
     app:np_selectedTextColor="@color/colorPrimary"
+    app:np_selectedTextSize="@dimen/selected_text_size"
     app:np_textColor="@color/colorPrimary"
     app:np_textSize="@dimen/text_size"
-    app:np_selectedTextSize="@dimen/selected_text_size"
     app:np_typeface="@string/roboto_light"
     app:np_value="3" />
 ```
@@ -89,11 +90,12 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_formatter|The formatter of the numbers.|
 |np_max|The max value of this widget.|
 |np_min|The min value of this widget.|
+|np_order|The order of this widget. Default is ascending.|
 |np_orientation|The orientation of this widget. Default is vertical.|
 |np_selectedTextColor|The text color of the selected number.|
+|np_selectedTextSize|The text size of the selected number.|
 |np_textColor|The text color of the numbers.|
 |np_textSize|The text size of the numbers.|
-|np_selectedTextSize|The text size of the selected number.|
 |np_typeface|The typeface of the numbers.|
 |np_value|The current value of this widget.|
 |np_wheelItemCount|The number of items show in the selector wheel.|
@@ -111,7 +113,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.shawnlin:number-picker:2.4.3'
+    compile 'com.shawnlin:number-picker:2.4.4'
 }
 ```
 
