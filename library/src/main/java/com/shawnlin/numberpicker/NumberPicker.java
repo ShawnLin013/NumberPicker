@@ -1008,7 +1008,7 @@ public class NumberPicker extends LinearLayout {
         if (scroller.isFinished()) {
             onScrollerFinished(scroller);
         } else {
-            invalidate();
+            postInvalidate();
         }
     }
 
