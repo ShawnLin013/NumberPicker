@@ -272,6 +272,11 @@ public class NumberPicker extends LinearLayout {
     private int mValue;
 
     /**
+     * Listener to be notified upon current value click.
+     */
+    private OnClickListener mOnClickListener;
+
+    /**
      * Listener to be notified upon current value change.
      */
     private OnValueChangeListener mOnValueChangeListener;
@@ -793,6 +798,11 @@ public class NumberPicker extends LinearLayout {
                     } else if (!mAdjustScroller.isFinished()) {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
+                    } else if (mLastDownEventX >= mLeftOfSelectionDividerLeft
+                        && mLastDownEventX <= mRightOfSelectionDividerRight) {
+                        if (mOnClickListener != null) {
+                            mOnClickListener.onClick(this);
+                        }
                     } else if (mLastDownEventX < mLeftOfSelectionDividerLeft) {
                         postChangeCurrentByOneFromLongPress(false, ViewConfiguration.getLongPressTimeout());
                     } else if (mLastDownEventX > mRightOfSelectionDividerRight) {
@@ -810,6 +820,11 @@ public class NumberPicker extends LinearLayout {
                     } else if (!mAdjustScroller.isFinished()) {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
+                    } else if (mLastDownEventY >= mTopSelectionDividerTop
+                        && mLastDownEventY <= mBottomSelectionDividerBottom) {
+                        if (mOnClickListener != null) {
+                            mOnClickListener.onClick(this);
+                        }
                     } else if (mLastDownEventY < mTopSelectionDividerTop) {
                         postChangeCurrentByOneFromLongPress(false, ViewConfiguration.getLongPressTimeout());
                     } else if (mLastDownEventY > mBottomSelectionDividerBottom) {
@@ -1102,6 +1117,15 @@ public class NumberPicker extends LinearLayout {
                 mCurrentScrollOffset = mInitialScrollOffset;
             }
         }
+    }
+
+    /**
+     * Set listener to be notified on click of the current value.
+     *
+     * @param onClickListener The listener.
+     */
+    public void setOnClickListener(OnClickListener onClickListener) {
+        mOnClickListener = onClickListener;
     }
 
     /**
