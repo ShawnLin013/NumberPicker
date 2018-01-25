@@ -5,19 +5,25 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
 
 import com.shawnlin.numberpicker.NumberPicker;
 
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
+
+    private static String TAG = "NumberPicker";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        NumberPicker numberPicker = (NumberPicker) findViewById(R.id.number_picker);
+        NumberPicker numberPicker = findViewById(R.id.number_picker);
 
         // set divider color
         numberPicker.setDividerColor(ContextCompat.getColor(this, R.color.colorPrimary));
@@ -53,6 +59,22 @@ public class MainActivity extends AppCompatActivity {
         numberPicker.setMaxValue(59);
         numberPicker.setMinValue(0);
         numberPicker.setValue(3);
+
+        // OnClickListener
+        numberPicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Click on current value");
+            }
+        });
+
+        // OnValueChangeListener
+        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                Log.d(TAG, String.format(Locale.US, "oldVal: %d, newVal: %d", oldVal, newVal));
+            }
+        });
     }
 
 }
