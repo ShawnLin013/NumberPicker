@@ -1023,7 +1023,7 @@ public class NumberPicker extends LinearLayout {
         if (scroller.isFinished()) {
             onScrollerFinished(scroller);
         } else {
-            invalidate();
+            postInvalidate();
         }
     }
 
@@ -1205,6 +1205,7 @@ public class NumberPicker extends LinearLayout {
         if (!mComputeMaxWidth) {
             return;
         }
+        mSelectorWheelPaint.setTextSize(Math.max(mTextSize, mSelectedTextSize));
         int maxTextWidth = 0;
         if (mDisplayedValues == null) {
             float maxDigitWidth = 0;
