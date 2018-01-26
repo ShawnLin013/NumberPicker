@@ -482,6 +482,16 @@ public class NumberPicker extends LinearLayout {
     private int mOrder;
 
     /**
+     * Flag whether the fading edge should enabled.
+     */
+    private boolean mFadingEdgeEnabled = true;
+
+    /**
+     * Flag whether the scroller should enabled.
+     */
+    private boolean mScrollerEnabled = true;
+
+    /**
      * The context of this widget.
      */
     private Context mContext;
@@ -615,6 +625,8 @@ public class NumberPicker extends LinearLayout {
         mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, spToPx(mTextSize));
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
+        mFadingEdgeEnabled = attributesArray.getBoolean(R.styleable.NumberPicker_np_fadingEdgeEnabled, mFadingEdgeEnabled);
+        mScrollerEnabled = attributesArray.getBoolean(R.styleable.NumberPicker_np_scrollerEnabled, mScrollerEnabled);
         mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheelItemCount, mWheelItemCount);
 
         // By default Linearlayout that we extend is not drawn. This is
@@ -842,6 +854,9 @@ public class NumberPicker extends LinearLayout {
         if (!isEnabled()) {
             return false;
         }
+        if (!isScrollerEnabled()) {
+            return false;
+        }
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
         }
@@ -997,6 +1012,10 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     public void computeScroll() {
+        if (!isScrollerEnabled()) {
+            return;
+        }
+
         Scroller scroller = mFlingScroller;
         if (scroller.isFinished()) {
             scroller = mAdjustScroller;
@@ -1035,6 +1054,9 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     public void scrollBy(int x, int y) {
+        if (!isScrollerEnabled()) {
+            return;
+        }
         int[] selectorIndices = getSelectorIndices();
         int gap;
         if (isHorizontalMode()) {
@@ -1409,22 +1431,22 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     protected float getTopFadingEdgeStrength() {
-        return isHorizontalMode() ? 0: FADING_EDGE_STRENGTH;
+        return !isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
     protected float getBottomFadingEdgeStrength() {
-        return isHorizontalMode() ? 0: FADING_EDGE_STRENGTH;
+        return !isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
     protected float getLeftFadingEdgeStrength() {
-        return isHorizontalMode() ? FADING_EDGE_STRENGTH : 0;
+        return isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
     protected float getRightFadingEdgeStrength() {
-        return isHorizontalMode() ? FADING_EDGE_STRENGTH : 0;
+        return isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
@@ -1507,7 +1529,7 @@ public class NumberPicker extends LinearLayout {
     public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
         super.onInitializeAccessibilityEvent(event);
         event.setClassName(NumberPicker.class.getName());
-        event.setScrollable(true);
+        event.setScrollable(isScrollerEnabled());
         final int scroll = (mMinValue + mValue) * mSelectorElementSize;
         final int maxScroll = (mMaxValue - mMinValue) * mSelectorElementSize;
         if (isHorizontalMode()) {
@@ -2150,6 +2172,14 @@ public class NumberPicker extends LinearLayout {
         setFormatter(getResources().getString(stringId));
     }
 
+    public void setFadingEdgeEnabled(boolean fadingEdgeEnabled) {
+        mFadingEdgeEnabled = fadingEdgeEnabled;
+    }
+
+    public void setScrollerEnabled(boolean scrollerEnabled) {
+        mScrollerEnabled = scrollerEnabled;
+    }
+
     public void setSelectedTextColor(@ColorInt int color) {
         mSelectedTextColor = color;
         mSelectedText.setTextColor(mSelectedTextColor);
@@ -2279,6 +2309,14 @@ public class NumberPicker extends LinearLayout {
 
     public Formatter getFormatter() {
         return mFormatter;
+    }
+
+    public boolean isFadingEdgeEnabled() {
+        return mFadingEdgeEnabled;
+    }
+
+    public boolean isScrollerEnabled() {
+        return mScrollerEnabled;
     }
 
     public int getSelectedTextColor() {
