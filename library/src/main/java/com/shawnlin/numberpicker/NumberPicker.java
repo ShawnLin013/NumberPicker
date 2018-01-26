@@ -482,6 +482,11 @@ public class NumberPicker extends LinearLayout {
     private int mOrder;
 
     /**
+     * Flag whether the fading edge should enabled.
+     */
+    private boolean mFadingEdgeEnabled = true;
+
+    /**
      * The context of this widget.
      */
     private Context mContext;
@@ -615,6 +620,7 @@ public class NumberPicker extends LinearLayout {
         mTextSize = attributesArray.getDimension(R.styleable.NumberPicker_np_textSize, spToPx(mTextSize));
         mTypeface = Typeface.create(attributesArray.getString(R.styleable.NumberPicker_np_typeface), Typeface.NORMAL);
         mFormatter = stringToFormatter(attributesArray.getString(R.styleable.NumberPicker_np_formatter));
+        mFadingEdgeEnabled = attributesArray.getBoolean(R.styleable.NumberPicker_np_fadingEdge, mFadingEdgeEnabled);
         mWheelItemCount = attributesArray.getInt(R.styleable.NumberPicker_np_wheelItemCount, mWheelItemCount);
 
         // By default Linearlayout that we extend is not drawn. This is
@@ -1409,22 +1415,22 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     protected float getTopFadingEdgeStrength() {
-        return isHorizontalMode() ? 0: FADING_EDGE_STRENGTH;
+        return !isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
     protected float getBottomFadingEdgeStrength() {
-        return isHorizontalMode() ? 0: FADING_EDGE_STRENGTH;
+        return !isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
     protected float getLeftFadingEdgeStrength() {
-        return isHorizontalMode() ? FADING_EDGE_STRENGTH : 0;
+        return isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
     protected float getRightFadingEdgeStrength() {
-        return isHorizontalMode() ? FADING_EDGE_STRENGTH : 0;
+        return isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
     }
 
     @Override
@@ -2150,6 +2156,10 @@ public class NumberPicker extends LinearLayout {
         setFormatter(getResources().getString(stringId));
     }
 
+    public void setFadingEdgeEnabled(boolean fadingEdgeEnabled) {
+        mFadingEdgeEnabled = fadingEdgeEnabled;
+    }
+
     public void setSelectedTextColor(@ColorInt int color) {
         mSelectedTextColor = color;
         mSelectedText.setTextColor(mSelectedTextColor);
@@ -2279,6 +2289,10 @@ public class NumberPicker extends LinearLayout {
 
     public Formatter getFormatter() {
         return mFormatter;
+    }
+
+    public boolean isFadingEdgeEnabled() {
+        return mFadingEdgeEnabled;
     }
 
     public int getSelectedTextColor() {

@@ -61,6 +61,12 @@ public class MainActivity extends AppCompatActivity {
         numberPicker.setMinValue(0);
         numberPicker.setValue(3);
 
+        // Set fading edge
+        numberPicker.setFadingEdgeEnabled(true);
+
+        // Set wrap selector wheel
+        numberPicker.setWrapSelectorWheel(true);
+
         // OnClickListener
         numberPicker.setOnClickListener(new View.OnClickListener() {
             @Override
