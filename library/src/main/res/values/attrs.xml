@@ -10,7 +10,7 @@
         <attr name="np_dividerDistance" format="dimension" />
         <attr name="np_dividerThickness" format="dimension" />
         <attr name="np_formatter" format="string" />
-        <attr name="np_fadingEdge" format="boolean" />
+        <attr name="np_fadingEdgeEnabled" format="boolean" />
         <attr name="np_max" format="integer" />
         <attr name="np_min" format="integer" />
         <attr name="np_order" format="enum">
@@ -21,6 +21,7 @@
             <enum name="horizontal" value="0" />
             <enum name="vertical" value="1" />
         </attr>
+        <attr name="np_scrollerEnabled" format="boolean" />
         <attr name="np_selectedTextColor" format="color" />
         <attr name="np_selectedTextSize" format="dimension" />
         <attr name="np_textColor" format="color" />

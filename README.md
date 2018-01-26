@@ -66,6 +66,15 @@ numberPicker.setMaxValue(data.length);
 numberPicker.setDisplayedValues(data);
 numberPicker.setValue(7);
 
+// Set fading edge enabled
+numberPicker.setFadingEdgeEnabled(true);
+
+// Set scroller enabled
+numberPicker.setScrollerEnabled(true);
+
+// Set wrap selector wheel
+numberPicker.setWrapSelectorWheel(true);
+
 // OnClickListener
 numberPicker.setOnClickListener(new View.OnClickListener() {
     @Override
@@ -116,11 +125,13 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_dividerColor|The color of the selection divider.|
 |np_dividerDistance|The distance between the two selection dividers.|
 |np_dividerThickness|The thickness of the selection divider.|
+|np_fadingEdgeEnabled|Flag whether the fading edge should enabled.|
 |np_formatter|The formatter of the numbers.|
 |np_max|The max value of this widget.|
 |np_min|The min value of this widget.|
 |np_order|The order of this widget. Default is ascending.|
 |np_orientation|The orientation of this widget. Default is vertical.|
+|np_scrollerEnabled|Flag whether the scroller should enabled.|
 |np_selectedTextColor|The text color of the selected number.|
 |np_selectedTextSize|The text size of the selected number.|
 |np_textColor|The text color of the numbers.|
