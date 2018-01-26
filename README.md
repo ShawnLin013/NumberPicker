@@ -22,36 +22,65 @@ It's based on [android.widget.NumberPicker](https://android.googlesource.com/pla
 ```java
 NumberPicker numberPicker = (NumberPicker) findViewById(R.id.number_picker);
 
-// set divider color
+// Set divider color
 numberPicker.setDividerColor(ContextCompat.getColor(this, R.color.colorPrimary));
 numberPicker.setDividerColorResource(R.color.colorPrimary);
 
-// set formatter
+// Set formatter
 numberPicker.setFormatter(getString(R.string.number_picker_formatter));
 numberPicker.setFormatter(R.string.number_picker_formatter);
 
-// set selected text color
+// Set selected text color
 numberPicker.setSelectedTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
 numberPicker.setSelectedTextColorResource(R.color.colorPrimary);
 
-// set text color
-numberPicker.setTextColor(ContextCompat.getColor(this, R.color.dark_grey));
-numberPicker.setTextColorResource(R.color.dark_grey);
-
-// set text size
-numberPicker.setTextSize(getResources().getDimension(R.dimen.text_size));
-numberPicker.setTextSize(R.dimen.text_size);
-
-// set selected text size
+// Set selected text size
 numberPicker.setSelectedTextSize(getResources().getDimension(R.dimen.selected_text_size));
 numberPicker.setSelectedTextSize(R.dimen.selected_text_size);
 
-// set typeface
+// Set text color
+numberPicker.setTextColor(ContextCompat.getColor(this, R.color.dark_grey));
+numberPicker.setTextColorResource(R.color.dark_grey);
+
+// Set text size
+numberPicker.setTextSize(getResources().getDimension(R.dimen.text_size));
+numberPicker.setTextSize(R.dimen.text_size);
+
+// Set typeface
 numberPicker.setTypeface(Typeface.create(getString(R.string.roboto_light), Typeface.NORMAL));
 numberPicker.setTypeface(getString(R.string.roboto_light), Typeface.NORMAL);
 numberPicker.setTypeface(getString(R.string.roboto_light));
 numberPicker.setTypeface(R.string.roboto_light, Typeface.NORMAL);
 numberPicker.setTypeface(R.string.roboto_light);
+
+// Set value
+numberPicker.setMaxValue(59);
+numberPicker.setMinValue(0);
+numberPicker.setValue(3);
+
+// Using string values
+// IMPORTANT! setMinValue to 1 and call setDisplayedValues after setMinValue and setMaxValue
+String[] data = {"A", "B", "C", "D", "E", "F", "G", "H", "I"};
+numberPicker.setMinValue(1);
+numberPicker.setMaxValue(data.length);
+numberPicker.setDisplayedValues(data);
+numberPicker.setValue(7);
+
+// OnClickListener
+numberPicker.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        Log.d(TAG, "Click on current value");
+    }
+});
+
+// OnValueChangeListener
+numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+    @Override
+    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+        Log.d(TAG, String.format(Locale.US, "oldVal: %d, newVal: %d", oldVal, newVal));
+    }
+});
 ```
 
 #### XML
