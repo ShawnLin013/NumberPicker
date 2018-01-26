@@ -20,14 +20,12 @@ dependencies {
 
 publish {
     userOrg = POM_DEVELOPER_ID
-    groupId = GROUP
+    groupId = GROUP_ID
     artifactId = ARTIFACT_ID
     publishVersion = VERSION_NAME
-    licences = ['Apache-2.0']
+    licences = [POM_LICENSE_NAME]
     desc = POM_DESCRIPTION
     website = POM_URL
-    issueTracker = ISSUE_URL
-    repository = POM_SCM_URL
     autoPublish = false
     dryRun = false
 }
