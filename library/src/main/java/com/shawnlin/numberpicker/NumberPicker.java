@@ -192,6 +192,16 @@ public class NumberPicker extends LinearLayout {
     private final EditText mSelectedText;
 
     /**
+     * The center X position of the selected text.
+     */
+    private float mSelectedTextCenterX;
+
+    /**
+     * The center Y position of the selected text.
+     */
+    private float mSelectedTextCenterY;
+
+    /**
      * The min height of this widget.
      */
     private int mMinHeight;
@@ -714,6 +724,8 @@ public class NumberPicker extends LinearLayout {
         final int inptTxtRight = inptTxtLeft + inptTxtMsrdWdth;
         final int inptTxtBottom = inptTxtTop + inptTxtMsrdHght;
         mSelectedText.layout(inptTxtLeft, inptTxtTop, inptTxtRight, inptTxtBottom);
+        mSelectedTextCenterX = mSelectedText.getX() + mSelectedText.getMeasuredWidth() / 2;
+        mSelectedTextCenterY = mSelectedText.getY() + mSelectedText.getMeasuredHeight() / 2;
 
         if (changed) {
             // need to do all this when we know our size
@@ -1220,6 +1232,17 @@ public class NumberPicker extends LinearLayout {
         setValueInternal(value, false);
     }
 
+    private float getMaxTextSize() {
+        return Math.max(mTextSize, mSelectedTextSize);
+    }
+
+    private float getPaintCenterY(Paint.FontMetrics fontMetrics) {
+        if (fontMetrics == null) {
+            return 0;
+        }
+        return Math.abs(fontMetrics.top + fontMetrics.bottom) / 2;
+    }
+
     /**
      * Computes the max width if no such specified as an attribute.
      */
@@ -1227,7 +1250,7 @@ public class NumberPicker extends LinearLayout {
         if (!mComputeMaxWidth) {
             return;
         }
-        mSelectorWheelPaint.setTextSize(Math.max(mTextSize, mSelectedTextSize));
+        mSelectorWheelPaint.setTextSize(getMaxTextSize());
         int maxTextWidth = 0;
         if (mDisplayedValues == null) {
             float maxDigitWidth = 0;
@@ -1485,7 +1508,11 @@ public class NumberPicker extends LinearLayout {
             // IME he may see a dimmed version of the old value intermixed
             // with the new one.
             if (i != mWheelMiddleItemIndex || mSelectedText.getVisibility() != VISIBLE) {
-                canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaint);
+                if (isHorizontalMode()) {
+                    canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaint);
+                } else {
+                    canvas.drawText(scrollSelectorValue, x, y + getPaintCenterY(mSelectorWheelPaint.getFontMetrics()), mSelectorWheelPaint);
+                }
             }
 
             if (isHorizontalMode()) {
@@ -1698,23 +1725,19 @@ public class NumberPicker extends LinearLayout {
     private void initializeSelectorWheel() {
         initializeSelectorWheelIndices();
         int[] selectorIndices = getSelectorIndices();
-        int totalTextSize = selectorIndices.length * (int) mTextSize;
+        int totalTextSize = (selectorIndices.length - 1) * (int) mTextSize + (int) mSelectedTextSize;
         float textGapCount = selectorIndices.length;
-        int editTextTextPosition;
         if (isHorizontalMode()) {
             float totalTextGapWidth = (getRight() - getLeft()) - totalTextSize;
-            mSelectorTextGapWidth = (int) (totalTextGapWidth / textGapCount + 0.5f);
-            mSelectorElementSize = (int) mTextSize + mSelectorTextGapWidth;
-            // Ensure that the middle item is positioned the same as the text in mSelectedText
-            editTextTextPosition = mSelectedText.getRight() / 2;
+            mSelectorTextGapWidth = (int) (totalTextGapWidth / textGapCount);
+            mSelectorElementSize = (int) getMaxTextSize() + mSelectorTextGapWidth;
+            mInitialScrollOffset = (int) mSelectedTextCenterX - (mSelectorElementSize * mWheelMiddleItemIndex);
         } else {
             float totalTextGapHeight = (getBottom() - getTop()) - totalTextSize;
-            mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount + 0.5f);
-            mSelectorElementSize = (int) mTextSize + mSelectorTextGapHeight;
-            // Ensure that the middle item is positioned the same as the text in mSelectedText
-            editTextTextPosition = mSelectedText.getBaseline() + mSelectedText.getTop();
+            mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount);
+            mSelectorElementSize = (int) getMaxTextSize() + mSelectorTextGapHeight;
+            mInitialScrollOffset = (int) mSelectedTextCenterY - (mSelectorElementSize * mWheelMiddleItemIndex);
         }
-        mInitialScrollOffset = editTextTextPosition - (mSelectorElementSize * mWheelMiddleItemIndex);
         mCurrentScrollOffset = mInitialScrollOffset;
         updateInputTextView();
     }
