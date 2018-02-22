@@ -116,6 +116,11 @@ public class NumberPicker extends LinearLayout {
     private static final int DEFAULT_MIN_VALUE = 1;
 
     /**
+     * The default wheel item count of this widget.
+     */
+    private static final int DEFAULT_WHEEL_ITEM_COUNT = 3;
+
+    /**
      * The default max height of this widget.
      */
     private static final int DEFAULT_MAX_HEIGHT = 180;
@@ -314,7 +319,12 @@ public class NumberPicker extends LinearLayout {
     /**
      * The number of items show in the selector wheel.
      */
-    private int mWheelItemCount = 3;
+    private int mWheelItemCount = DEFAULT_WHEEL_ITEM_COUNT;
+
+    /**
+     * The real number of items show in the selector wheel.
+     */
+    private int mRealWheelItemCount = DEFAULT_WHEEL_ITEM_COUNT;
 
     /**
      * The index of the middle selector item.
@@ -1480,13 +1490,22 @@ public class NumberPicker extends LinearLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        // save canvas
+        canvas.save();
+
         float x, y;
         if (isHorizontalMode()) {
             x = mCurrentScrollOffset;
             y = mSelectedText.getBaseline() + mSelectedText.getTop();
+            if (mRealWheelItemCount < DEFAULT_WHEEL_ITEM_COUNT) {
+                canvas.clipRect(mLeftOfSelectionDividerLeft, 0, mRightOfSelectionDividerRight, getBottom());
+            }
         } else {
             x = (getRight() - getLeft()) / 2;
             y = mCurrentScrollOffset;
+            if (mRealWheelItemCount < DEFAULT_WHEEL_ITEM_COUNT) {
+                canvas.clipRect(0, mTopSelectionDividerTop, getRight(), mBottomSelectionDividerBottom);
+            }
         }
 
         // draw the selector wheel
@@ -1521,6 +1540,9 @@ public class NumberPicker extends LinearLayout {
                 y += mSelectorElementSize;
             }
         }
+
+        // restore canvas
+        canvas.restore();
 
         // draw the selection dividers
         if (mSelectionDivider != null) {
@@ -2177,8 +2199,12 @@ public class NumberPicker extends LinearLayout {
         setWidthAndHeight();
     }
 
-    public void setWheelItemCount(final int count) {
-        mWheelItemCount = count;
+    public void setWheelItemCount(int count) {
+        if (count < 1) {
+            throw new IllegalArgumentException("Wheel item count must be >= 1");
+        }
+        mRealWheelItemCount = count;
+        mWheelItemCount = count < DEFAULT_WHEEL_ITEM_COUNT ? DEFAULT_WHEEL_ITEM_COUNT : count;
         mWheelMiddleItemIndex = mWheelItemCount / 2;
         mSelectorIndices = new int[mWheelItemCount];
     }
