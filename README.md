@@ -159,4 +159,4 @@ dependencies {
 
 ## License
 
-The source code is licensed under the [MIT](License) license.
+The source code is licensed under the [MIT](LICENSE) license.
