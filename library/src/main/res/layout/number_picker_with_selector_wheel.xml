@@ -6,6 +6,7 @@
         android:layout_height="wrap_content"
         android:background="@null"
         android:gravity="center"
+        android:importantForAccessibility="no"
         android:hint="@null"
         android:singleLine="true" />
 </merge>
