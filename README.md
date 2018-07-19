@@ -62,7 +62,7 @@ numberPicker.setValue(3);
 // IMPORTANT! setMinValue to 1 and call setDisplayedValues after setMinValue and setMaxValue
 String[] data = {"A", "B", "C", "D", "E", "F", "G", "H", "I"};
 numberPicker.setMinValue(1);
-numberPicker.setMaxValue(data.length);
+numberPicker.setMaxValue(data.length-1);
 numberPicker.setDisplayedValues(data);
 numberPicker.setValue(7);
 
