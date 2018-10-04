@@ -2439,6 +2439,10 @@ public class NumberPicker extends LinearLayout {
         return spToPx(mTextSize);
     }
 
+    public int getIntervalTextColor() {
+        return mTextColor;
+    }
+
     public Typeface getTypeface() {
         return mTypeface;
     }
