@@ -30,5 +30,8 @@
         <attr name="np_value" format="integer" />
         <attr name="np_wheelItemCount" format="integer" />
         <attr name="np_wrapSelectorWheel" format="boolean" />
+        <attr name="np_intervalColor" format="color"/>
+        <attr name="np_minInterval" format="integer"/>
+        <attr name="np_maxInterval" format="integer"/>
     </declare-styleable>
 </resources>

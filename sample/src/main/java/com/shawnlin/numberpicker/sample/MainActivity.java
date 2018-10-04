@@ -61,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
         numberPicker.setMinValue(0);
         numberPicker.setValue(3);
 
+        // Set interval
+        numberPicker.setIntervalTextColorResource(R.color.colorAccent);
+        numberPicker.setMinIntervalValue(3);
+        numberPicker.setMaxIntervalValue(6);
+
         // Set fading edge enabled
         numberPicker.setFadingEdgeEnabled(true);
 
