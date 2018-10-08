@@ -118,7 +118,7 @@ public class NumberPicker extends LinearLayout {
     /**
      * The default min/max interval value.
      */
-    private static final int DEFAULT_INTERVAL_VALUE = -1;
+    private static final int DEFAULT_INTERVAL_VALUE = Integer.MIN_VALUE;
 
     /**
      * The default wheel item count of this widget.
