@@ -1,6 +1,7 @@
 package com.shawnlin.numberpicker;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -37,6 +38,7 @@ import android.widget.LinearLayout;
 
 import java.lang.annotation.Retention;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Locale;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -517,6 +519,11 @@ public class NumberPicker extends LinearLayout {
     private Context mContext;
 
     /**
+     * Number formatter for current locale
+     */
+    private NumberFormat mNumberFormatter;
+
+    /**
      * Interface to listen for changes of the current value.
      */
     public interface OnValueChangeListener {
@@ -554,11 +561,11 @@ public class NumberPicker extends LinearLayout {
         /**
          * Callback invoked while the number picker scroll state has changed.
          *
-         * @param view The view whose scroll state is being reported.
+         * @param view        The view whose scroll state is being reported.
          * @param scrollState The current scroll state. One of
-         *            {@link #SCROLL_STATE_IDLE},
-         *            {@link #SCROLL_STATE_TOUCH_SCROLL} or
-         *            {@link #SCROLL_STATE_IDLE}.
+         *                    {@link #SCROLL_STATE_IDLE},
+         *                    {@link #SCROLL_STATE_TOUCH_SCROLL} or
+         *                    {@link #SCROLL_STATE_IDLE}.
          */
         public void onScrollStateChange(NumberPicker view, int scrollState);
     }
@@ -606,6 +613,7 @@ public class NumberPicker extends LinearLayout {
     public NumberPicker(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs);
         mContext = context;
+        mNumberFormatter = NumberFormat.getInstance();
 
         TypedArray attributesArray = context.obtainStyledAttributes(attrs, R.styleable.NumberPicker, defStyle, 0);
 
@@ -1163,6 +1171,12 @@ public class NumberPicker extends LinearLayout {
         }
     }
 
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mNumberFormatter = NumberFormat.getInstance();
+    }
+
     /**
      * Set listener to be notified on click of the current value.
      *
@@ -1265,7 +1279,7 @@ public class NumberPicker extends LinearLayout {
         if (mDisplayedValues == null) {
             float maxDigitWidth = 0;
             for (int i = 0; i <= 9; i++) {
-                final float digitWidth = mSelectorWheelPaint.measureText(formatNumberWithLocale(i));
+                final float digitWidth = mSelectorWheelPaint.measureText(formatNumber(i));
                 if (digitWidth > maxDigitWidth) {
                     maxDigitWidth = digitWidth;
                 }
@@ -2160,7 +2174,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     private String formatNumberWithLocale(int value) {
-        return String.format(Locale.getDefault(), "%d", value);
+        return mNumberFormatter.format(value);
     }
 
     private void setWidthAndHeight() {
