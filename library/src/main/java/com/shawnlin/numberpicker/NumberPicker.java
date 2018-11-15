@@ -1711,7 +1711,16 @@ public class NumberPicker extends LinearLayout {
             notifyChange(previous, current);
         }
         initializeSelectorWheelIndices();
+        updateAccessibilityDescription();
         invalidate();
+    }
+
+    /**
+     * Updates the accessibility values of the view,
+     * to the currently selected value
+     */
+    private void updateAccessibilityDescription() {
+        this.setContentDescription(String.valueOf(getValue()));
     }
 
     /**
