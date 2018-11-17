@@ -8,5 +8,6 @@
         android:gravity="center"
         android:importantForAccessibility="no"
         android:hint="@null"
-        android:singleLine="true" />
+        android:singleLine="false"
+        android:visibility="invisible"/>
 </merge>
