@@ -9,7 +9,7 @@ It's based on [android.widget.NumberPicker](https://android.googlesource.com/pla
 
 ## Features
 
-- Customizable fonts(color, size, typeface)
+- Customizable fonts(color, size, strikethrough, underline, typeface)
 - Customizable dividers(color, distance, thickness)
 - Horizontal and Vertical mode are both supported
 - Ascending and Descending order are both supported
@@ -119,7 +119,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 ### Attributes
 
 |attribute name|attribute description|
-|:-:|:-:|
+|:---:|:---:|
 |np_width|The width of this widget.|
 |np_height|The height of this widget.|
 |np_dividerColor|The color of the selection divider.|
@@ -133,10 +133,16 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_order|The order of this widget. Default is ascending.|
 |np_orientation|The orientation of this widget. Default is vertical.|
 |np_scrollerEnabled|Flag whether the scroller should enabled.|
+|np_selectedTextAlign|The text align of the selected number. Default is center.|
 |np_selectedTextColor|The text color of the selected number.|
 |np_selectedTextSize|The text size of the selected number.|
+|np_selectedTextStrikeThru|Flag whether the selected text should strikethroughed.|
+|np_selectedTextUnderline|Flag whether the selected text should underlined.|
+|np_textAlign|The text align of the numbers. Default is center.|
 |np_textColor|The text color of the numbers.|
 |np_textSize|The text size of the numbers.|
+|np_textStrikeThru|Flag whether the text should strikethroughed.|
+|np_textUnderline|Flag whether the text should underlined.|
 |np_typeface|The typeface of the numbers.|
 |np_value|The current value of this widget.|
 |np_wheelItemCount|The number of items show in the selector wheel.|
