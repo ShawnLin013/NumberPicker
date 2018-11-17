@@ -13,7 +13,7 @@ It's based on [android.widget.NumberPicker](https://android.googlesource.com/pla
 - Customizable dividers(color, distance, thickness)
 - Horizontal and Vertical mode are both supported
 - Ascending and Descending order are both supported
-- Also supports the negative values
+- Also supports negative values and multiple lines
 
 ## Usage
 
@@ -127,6 +127,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_dividerThickness|The thickness of the selection divider.|
 |np_fadingEdgeEnabled|Flag whether the fading edge should enabled.|
 |np_formatter|The formatter of the numbers.|
+|np_lineSpacingMultiplier|The line spacing multiplier for the multiple lines.|
 |np_max|The max value of this widget.|
 |np_min|The min value of this widget.|
 |np_order|The order of this widget. Default is ascending.|

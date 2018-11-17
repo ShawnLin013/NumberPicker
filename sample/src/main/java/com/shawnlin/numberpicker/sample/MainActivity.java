@@ -2,15 +2,16 @@ package com.shawnlin.numberpicker.sample;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
 import com.shawnlin.numberpicker.NumberPicker;
 
 import java.util.Locale;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,6 +61,12 @@ public class MainActivity extends AppCompatActivity {
         numberPicker.setMaxValue(59);
         numberPicker.setMinValue(0);
         numberPicker.setValue(3);
+
+        // Set string values
+//        String[] data = {"A", "B", "C", "D", "E", "F", "G", "H", "I"};
+//        numberPicker.setMinValue(1);
+//        numberPicker.setMaxValue(data.length);
+//        numberPicker.setDisplayedValues(data);
 
         // Set fading edge enabled
         numberPicker.setFadingEdgeEnabled(true);
