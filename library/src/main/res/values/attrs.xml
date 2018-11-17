@@ -23,10 +23,20 @@
             <enum name="vertical" value="1" />
         </attr>
         <attr name="np_scrollerEnabled" format="boolean" />
+        <attr name="np_selectedTextAlign" format="enum">
+            <enum name="selectedTextAlignRight" value="0" />
+            <enum name="selectedTextAlignCenter" value="1" />
+            <enum name="selectedTextAlignLeft" value="2" />
+        </attr>
         <attr name="np_selectedTextColor" format="color" />
         <attr name="np_selectedTextSize" format="dimension" />
         <attr name="np_selectedTextStrikeThru" format="boolean" />
         <attr name="np_selectedTextUnderline" format="boolean" />
+        <attr name="np_textAlign" format="enum">
+            <enum name="textAlignRight" value="0" />
+            <enum name="textAlignCenter" value="1" />
+            <enum name="textAlignLeft" value="2" />
+        </attr>
         <attr name="np_textColor" format="color" />
         <attr name="np_textSize" format="dimension" />
         <attr name="np_textStrikeThru" format="boolean" />

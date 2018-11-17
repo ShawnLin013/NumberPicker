@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Paint.Align;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -61,6 +60,14 @@ public class NumberPicker extends LinearLayout {
 
     public static final int ASCENDING = 0;
     public static final int DESCENDING = 1;
+
+    @Retention(SOURCE)
+    @IntDef({LEFT, CENTER, RIGHT})
+    public @interface Align{}
+
+    public static final int RIGHT = 0;
+    public static final int CENTER = 1;
+    public static final int LEFT = 2;
 
     /**
      * The default update interval during long press.
@@ -131,6 +138,11 @@ public class NumberPicker extends LinearLayout {
      * The default min width of this widget.
      */
     private static final int DEFAULT_MIN_WIDTH = 64;
+
+    /**
+     * The default align of text.
+     */
+    private static final int DEFAULT_TEXT_ALIGN = CENTER;
 
     /**
      * The default color of text.
@@ -239,6 +251,11 @@ public class NumberPicker extends LinearLayout {
     private final boolean mComputeMaxWidth;
 
     /**
+     * The align of the selected text.
+     */
+    private int mSelectedTextAlign = DEFAULT_TEXT_ALIGN;
+
+    /**
      * The color of the selected text.
      */
     private int mSelectedTextColor = DEFAULT_TEXT_COLOR;
@@ -257,6 +274,11 @@ public class NumberPicker extends LinearLayout {
      * Flag whether the selected text should underlined.
      */
     private boolean mSelectedTextUnderline;
+
+    /**
+     * The align of the text.
+     */
+    private int mTextAlign = DEFAULT_TEXT_ALIGN;
 
     /**
      * The color of the text.
@@ -682,6 +704,8 @@ public class NumberPicker extends LinearLayout {
         mMaxValue = attributes.getInt(R.styleable.NumberPicker_np_max, mMaxValue);
         mMinValue = attributes.getInt(R.styleable.NumberPicker_np_min, mMinValue);
 
+        mSelectedTextAlign = attributes.getInt(R.styleable.NumberPicker_np_selectedTextAlign,
+                mSelectedTextAlign);
         mSelectedTextColor = attributes.getColor(R.styleable.NumberPicker_np_selectedTextColor,
                 mSelectedTextColor);
         mSelectedTextSize = attributes.getDimension(R.styleable.NumberPicker_np_selectedTextSize,
@@ -690,6 +714,7 @@ public class NumberPicker extends LinearLayout {
                 R.styleable.NumberPicker_np_selectedTextStrikeThru, mSelectedTextStrikeThru);
         mSelectedTextUnderline = attributes.getBoolean(
                 R.styleable.NumberPicker_np_selectedTextUnderline, mSelectedTextUnderline);
+        mTextAlign = attributes.getInt(R.styleable.NumberPicker_np_textAlign, mTextAlign);
         mTextColor = attributes.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
         mTextSize = attributes.getDimension(R.styleable.NumberPicker_np_textSize,
                 spToPx(mTextSize));
@@ -729,7 +754,7 @@ public class NumberPicker extends LinearLayout {
         // create the selector wheel paint
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setTextAlign(Align.CENTER);
+        paint.setTextAlign(Paint.Align.CENTER);
         mSelectorWheelPaint = paint;
 
         setSelectedTextColor(mSelectedTextColor);
@@ -1593,11 +1618,13 @@ public class NumberPicker extends LinearLayout {
         int[] selectorIndices = getSelectorIndices();
         for (int i = 0; i < selectorIndices.length; i++) {
             if (i == mWheelMiddleItemIndex) {
+                mSelectorWheelPaint.setTextAlign(Paint.Align.values()[mSelectedTextAlign]);
                 mSelectorWheelPaint.setTextSize(mSelectedTextSize);
                 mSelectorWheelPaint.setColor(mSelectedTextColor);
                 mSelectorWheelPaint.setStrikeThruText(mSelectedTextStrikeThru);
                 mSelectorWheelPaint.setUnderlineText(mSelectedTextUnderline);
             } else {
+                mSelectorWheelPaint.setTextAlign(Paint.Align.values()[mTextAlign]);
                 mSelectorWheelPaint.setTextSize(mTextSize);
                 mSelectorWheelPaint.setColor(mTextColor);
                 mSelectorWheelPaint.setStrikeThruText(mTextStrikeThru);
@@ -2373,6 +2400,10 @@ public class NumberPicker extends LinearLayout {
         mScrollerEnabled = scrollerEnabled;
     }
 
+    public void setSelectedTextAlign(@Align int align) {
+        mSelectedTextAlign = align;
+    }
+
     public void setSelectedTextColor(@ColorInt int color) {
         mSelectedTextColor = color;
         mSelectedText.setTextColor(mSelectedTextColor);
@@ -2397,6 +2428,10 @@ public class NumberPicker extends LinearLayout {
 
     public void setSelectedTextUnderline(boolean underlineText) {
         mSelectedTextUnderline = underlineText;
+    }
+
+    public void setTextAlign(@Align int align) {
+        mTextAlign = align;
     }
 
     public void setTextColor(@ColorInt int color) {
@@ -2503,6 +2538,10 @@ public class NumberPicker extends LinearLayout {
         return mScrollerEnabled;
     }
 
+    public int getSelectedTextAlign() {
+        return mSelectedTextAlign;
+    }
+
     public int getSelectedTextColor() {
         return mSelectedTextColor;
     }
@@ -2517,6 +2556,10 @@ public class NumberPicker extends LinearLayout {
 
     public boolean getSelectedTextUnderline() {
         return mSelectedTextUnderline;
+    }
+
+    public int getTextAlign() {
+        return mTextAlign;
     }
 
     public int getTextColor() {

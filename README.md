@@ -133,10 +133,12 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_order|The order of this widget. Default is ascending.|
 |np_orientation|The orientation of this widget. Default is vertical.|
 |np_scrollerEnabled|Flag whether the scroller should enabled.|
+|np_selectedTextAlign|The text align of the selected number. Default is center.|
 |np_selectedTextColor|The text color of the selected number.|
 |np_selectedTextSize|The text size of the selected number.|
 |np_selectedTextStrikeThru|Flag whether the selected text should strikethroughed.|
 |np_selectedTextUnderline|Flag whether the selected text should underlined.|
+|np_textAlign|The text align of the numbers. Default is center.|
 |np_textColor|The text color of the numbers.|
 |np_textSize|The text size of the numbers.|
 |np_textStrikeThru|Flag whether the text should strikethroughed.|
