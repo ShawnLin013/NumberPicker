@@ -244,6 +244,21 @@ public class NumberPicker extends LinearLayout {
     private int mSelectedTextColor = DEFAULT_TEXT_COLOR;
 
     /**
+     * The size of the selected text.
+     */
+    private float mSelectedTextSize = DEFAULT_TEXT_SIZE;
+
+    /**
+     * Flag whether the selected text should strikethroughed.
+     */
+    private boolean mSelectedTextStrikeThru;
+
+    /**
+     * Flag whether the selected text should underlined.
+     */
+    private boolean mSelectedTextUnderline;
+
+    /**
      * The color of the text.
      */
     private int mTextColor = DEFAULT_TEXT_COLOR;
@@ -254,9 +269,14 @@ public class NumberPicker extends LinearLayout {
     private float mTextSize = DEFAULT_TEXT_SIZE;
 
     /**
-     * The size of the selected text.
+     * Flag whether the text should strikethroughed.
      */
-    private float mSelectedTextSize = DEFAULT_TEXT_SIZE;
+    private boolean mTextStrikeThru;
+
+    /**
+     * Flag whether the text should underlined.
+     */
+    private boolean mTextUnderline;
 
     /**
      * The typeface of the text.
@@ -666,9 +686,17 @@ public class NumberPicker extends LinearLayout {
                 mSelectedTextColor);
         mSelectedTextSize = attributes.getDimension(R.styleable.NumberPicker_np_selectedTextSize,
                 spToPx(mSelectedTextSize));
+        mSelectedTextStrikeThru = attributes.getBoolean(
+                R.styleable.NumberPicker_np_selectedTextStrikeThru, mSelectedTextStrikeThru);
+        mSelectedTextUnderline = attributes.getBoolean(
+                R.styleable.NumberPicker_np_selectedTextUnderline, mSelectedTextUnderline);
         mTextColor = attributes.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
         mTextSize = attributes.getDimension(R.styleable.NumberPicker_np_textSize,
                 spToPx(mTextSize));
+        mTextStrikeThru = attributes.getBoolean(
+                R.styleable.NumberPicker_np_textStrikeThru, mTextStrikeThru);
+        mTextUnderline = attributes.getBoolean(
+                R.styleable.NumberPicker_np_textUnderline, mTextUnderline);
         mTypeface = Typeface.create(attributes.getString(R.styleable.NumberPicker_np_typeface),
                 Typeface.NORMAL);
         mFormatter = stringToFormatter(attributes.getString(R.styleable.NumberPicker_np_formatter));
@@ -1567,9 +1595,13 @@ public class NumberPicker extends LinearLayout {
             if (i == mWheelMiddleItemIndex) {
                 mSelectorWheelPaint.setTextSize(mSelectedTextSize);
                 mSelectorWheelPaint.setColor(mSelectedTextColor);
+                mSelectorWheelPaint.setStrikeThruText(mSelectedTextStrikeThru);
+                mSelectorWheelPaint.setUnderlineText(mSelectedTextUnderline);
             } else {
                 mSelectorWheelPaint.setTextSize(mTextSize);
                 mSelectorWheelPaint.setColor(mTextColor);
+                mSelectorWheelPaint.setStrikeThruText(mTextStrikeThru);
+                mSelectorWheelPaint.setUnderlineText(mTextUnderline);
             }
 
             int selectorIndex = selectorIndices[isAscendingOrder()
@@ -2359,6 +2391,14 @@ public class NumberPicker extends LinearLayout {
         setSelectedTextSize(getResources().getDimension(dimenId));
     }
 
+    public void setSelectedTextStrikeThru(boolean strikeThruText) {
+        mSelectedTextStrikeThru = strikeThruText;
+    }
+
+    public void setSelectedTextUnderline(boolean underlineText) {
+        mSelectedTextUnderline = underlineText;
+    }
+
     public void setTextColor(@ColorInt int color) {
         mTextColor = color;
         mSelectorWheelPaint.setColor(mTextColor);
@@ -2375,6 +2415,14 @@ public class NumberPicker extends LinearLayout {
 
     public void setTextSize(@DimenRes int dimenId) {
         setTextSize(getResources().getDimension(dimenId));
+    }
+
+    public void setTextStrikeThru(boolean strikeThruText) {
+        mTextStrikeThru = strikeThruText;
+    }
+
+    public void setTextUnderline(boolean underlineText) {
+        mTextUnderline = underlineText;
     }
 
     public void setTypeface(Typeface typeface) {
@@ -2463,12 +2511,28 @@ public class NumberPicker extends LinearLayout {
         return mSelectedTextSize;
     }
 
+    public boolean getSelectedTextStrikeThru() {
+        return mSelectedTextStrikeThru;
+    }
+
+    public boolean getSelectedTextUnderline() {
+        return mSelectedTextUnderline;
+    }
+
     public int getTextColor() {
         return mTextColor;
     }
 
     public float getTextSize() {
         return spToPx(mTextSize);
+    }
+
+    public boolean getTextStrikeThru() {
+        return mTextStrikeThru;
+    }
+
+    public boolean getTextUnderline() {
+        return mTextUnderline;
     }
 
     public Typeface getTypeface() {
