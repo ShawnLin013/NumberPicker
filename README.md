@@ -152,7 +152,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 
 Add the dependency in your `build.gradle`
 
-```groovy
+```gradle
 buildscript {
     repositories {
         jcenter()
@@ -160,7 +160,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.shawnlin:number-picker:2.4.6'
+    compile 'com.shawnlin:number-picker:2.4.7'
 }
 ```
 
