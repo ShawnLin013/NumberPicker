@@ -1,5 +1,5 @@
-apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.android.library'
+apply plugin: "guru.stefma.bintrayrelease"
 
 android {
     compileSdkVersion 28
@@ -18,14 +18,18 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
 }
 
+version = VERSION_NAME
+group = GROUP_ID
+androidArtifact {
+    artifactId = ARTIFACT_ID
+    license {
+        name = POM_LICENSE_NAME
+        url = POM_LICENSE_URL
+        distribution = POM_LICENSE_DIST
+    }
+}
 publish {
     userOrg = POM_DEVELOPER_ID
-    groupId = GROUP_ID
-    artifactId = ARTIFACT_ID
-    publishVersion = VERSION_NAME
-    licences = [POM_LICENSE_NAME]
     desc = POM_DESCRIPTION
     website = POM_URL
-    autoPublish = false
-    dryRun = false
 }
