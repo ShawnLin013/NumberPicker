@@ -1689,9 +1689,10 @@ public class NumberPicker extends LinearLayout {
 
     private void drawText(String text, float x, float y, Paint paint, Canvas canvas) {
         if (text.contains("\n")) {
-            String[] lines = text.split("\n");
-            float height = (paint.descent() + paint.ascent()) * mLineSpacingMultiplier;
-            float diff = (lines.length - 1) * height / 2;
+            final String[] lines = text.split("\n");
+            final float height = Math.abs(paint.descent() + paint.ascent())
+                    * mLineSpacingMultiplier;
+            final float diff = (lines.length - 1) * height / 2;
             y -= diff;
             for (String line : lines) {
                 canvas.drawText(line, x, y, paint);
