@@ -35,6 +35,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.DimenRes;
@@ -693,13 +694,22 @@ public class NumberPicker extends LinearLayout {
         mContext = context;
         mNumberFormatter = NumberFormat.getInstance();
 
-        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.NumberPicker,
-                defStyle, 0);
+        final TypedArray attributes = context.obtainStyledAttributes(attrs,
+                R.styleable.NumberPicker, defStyle, 0);
 
-        mDividerDrawable = ContextCompat.getDrawable(context, R.drawable.np_numberpicker_divider);
-
-        mDividerColor = attributes.getColor(R.styleable.NumberPicker_np_dividerColor,
-                mDividerColor);
+        final Drawable selectionDivider = attributes.getDrawable(
+                R.styleable.NumberPicker_np_divider);
+        if (selectionDivider != null) {
+            selectionDivider.setCallback(this);
+            if (selectionDivider.isStateful()) {
+                selectionDivider.setState(getDrawableState());
+            }
+            mDividerDrawable = selectionDivider;
+        } else {
+            mDividerColor = attributes.getColor(R.styleable.NumberPicker_np_dividerColor,
+                    mDividerColor);
+            setDividerColor(mDividerColor);
+        }
 
         final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         final int defDividerDistance = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -773,7 +783,7 @@ public class NumberPicker extends LinearLayout {
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.number_picker_with_selector_wheel, this, true);
+        inflater.inflate(R.layout.number_picker_material, this, true);
 
         // input text
         mSelectedText = findViewById(R.id.np__numberpicker_input);
@@ -798,8 +808,6 @@ public class NumberPicker extends LinearLayout {
         setValue(mValue);
         setMaxValue(mMaxValue);
         setMinValue(mMinValue);
-
-        setDividerColor(mDividerColor);
 
         setWheelItemCount(mWheelItemCount);
 
@@ -1658,6 +1666,26 @@ public class NumberPicker extends LinearLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         removeAllCallbacks();
+    }
+
+    @CallSuper
+    @Override
+    protected void drawableStateChanged() {
+        super.drawableStateChanged();
+        final Drawable selectionDivider = mDividerDrawable;
+        if (selectionDivider != null && selectionDivider.isStateful()
+                && selectionDivider.setState(getDrawableState())) {
+            invalidateDrawable(selectionDivider);
+        }
+    }
+
+    @CallSuper
+    @Override
+    public void jumpDrawablesToCurrentState() {
+        super.jumpDrawablesToCurrentState();
+        if (mDividerDrawable != null) {
+            mDividerDrawable.jumpToCurrentState();
+        }
     }
 
     @Override

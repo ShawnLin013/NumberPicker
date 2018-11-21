@@ -6,6 +6,7 @@
     <declare-styleable name="NumberPicker">
         <attr name="np_width" format="dimension" />
         <attr name="np_height" format="dimension" />
+        <attr name="np_divider" format="reference" />
         <attr name="np_dividerColor" format="color" />
         <attr name="np_dividerDistance" format="dimension" />
         <attr name="np_dividerThickness" format="dimension" />
