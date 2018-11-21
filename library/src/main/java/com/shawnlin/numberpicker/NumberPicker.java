@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.LayoutInflater.Filter;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.DecelerateInterpolator;
@@ -849,6 +850,14 @@ public class NumberPicker extends LinearLayout {
             }
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Should be focusable by default, as the text view whose visibility changes is focusable
+            if (getFocusable() == View.FOCUSABLE_AUTO) {
+                setFocusable(View.FOCUSABLE);
+                setFocusableInTouchMode(true);
+            }
+        }
+
         attributes.recycle();
     }
 
@@ -1213,6 +1222,7 @@ public class NumberPicker extends LinearLayout {
             return;
         }
         int[] selectorIndices = getSelectorIndices();
+        int startScrollOffset = mCurrentScrollOffset;
         int gap;
         if (isHorizontalMode()) {
             if (isAscendingOrder()) {
@@ -1292,6 +1302,14 @@ public class NumberPicker extends LinearLayout {
             setValueInternal(selectorIndices[mWheelMiddleItemIndex], true);
             if (!mWrapSelectorWheel && selectorIndices[mWheelMiddleItemIndex] > mMaxValue) {
                 mCurrentScrollOffset = mInitialScrollOffset;
+            }
+        }
+
+        if (startScrollOffset != mCurrentScrollOffset) {
+            if (isHorizontalMode()) {
+                onScrollChanged(mCurrentScrollOffset, 0, startScrollOffset, 0);
+            } else {
+                onScrollChanged(0, mCurrentScrollOffset, 0, startScrollOffset);
             }
         }
     }
@@ -1950,7 +1968,10 @@ public class NumberPicker extends LinearLayout {
         }
         int previous = mValue;
         mValue = current;
-        updateInputTextView();
+        // If we're flinging, we'll update the text view at the end when it becomes visible
+        if (mScrollState != OnScrollListener.SCROLL_STATE_FLING) {
+            updateInputTextView();
+        }
         if (notifyChange) {
             notifyChange(previous, current);
         }
@@ -2034,9 +2055,8 @@ public class NumberPicker extends LinearLayout {
      */
     private void onScrollerFinished(Scroller scroller) {
         if (scroller == mFlingScroller) {
-            if (!ensureScrollWheelAdjusted()) {
-                updateInputTextView();
-            }
+            ensureScrollWheelAdjusted();
+            updateInputTextView();
             onScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
         } else if (mScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
             updateInputTextView();
@@ -2169,10 +2189,13 @@ public class NumberPicker extends LinearLayout {
          * number.
          */
         String text = (mDisplayedValues == null) ? formatNumber(mValue)
-            : mDisplayedValues[mValue - mMinValue];
-        if (!TextUtils.isEmpty(text) && !text.equals(mSelectedText.getText().toString())) {
-            mSelectedText.setText(text);
-            return true;
+                : mDisplayedValues[mValue - mMinValue];
+        if (!TextUtils.isEmpty(text)) {
+            CharSequence beforeText = mSelectedText.getText();
+            if (!text.equals(beforeText.toString())) {
+                mSelectedText.setText(text);
+                return true;
+            }
         }
 
         return false;
