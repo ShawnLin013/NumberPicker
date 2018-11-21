@@ -91,9 +91,9 @@ public class NumberPicker extends LinearLayout {
     private static final int SNAP_SCROLL_DURATION = 300;
 
     /**
-     * The strength of fading in the top and bottom while drawing the selector.
+     * The default strength of fading in the top and bottom while drawing the selector.
      */
-    private static final float FADING_EDGE_STRENGTH = 0.9f;
+    private static final float DEFAULT_FADING_EDGE_STRENGTH = 0.9f;
 
     /**
      * The default unscaled height of the divider.
@@ -557,6 +557,11 @@ public class NumberPicker extends LinearLayout {
     private boolean mFadingEdgeEnabled = true;
 
     /**
+     * The strength of fading in the top and bottom while drawing the selector.
+     */
+    private float mFadingEdgeStrength = DEFAULT_FADING_EDGE_STRENGTH;
+
+    /**
      * Flag whether the scroller should enabled.
      */
     private boolean mScrollerEnabled = true;
@@ -735,6 +740,8 @@ public class NumberPicker extends LinearLayout {
         mFormatter = stringToFormatter(attributes.getString(R.styleable.NumberPicker_np_formatter));
         mFadingEdgeEnabled = attributes.getBoolean(R.styleable.NumberPicker_np_fadingEdgeEnabled,
                 mFadingEdgeEnabled);
+        mFadingEdgeStrength = attributes.getFloat(R.styleable.NumberPicker_np_fadingEdgeStrength,
+                mFadingEdgeStrength);
         mScrollerEnabled = attributes.getBoolean(R.styleable.NumberPicker_np_scrollerEnabled,
                 mScrollerEnabled);
         mWheelItemCount = attributes.getInt(R.styleable.NumberPicker_np_wheelItemCount,
@@ -1570,7 +1577,7 @@ public class NumberPicker extends LinearLayout {
     }
 
     private float getFadingEdgeStrength(boolean isHorizontalMode) {
-        return isHorizontalMode && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
+        return isHorizontalMode && mFadingEdgeEnabled ? mFadingEdgeStrength : 0;
     }
 
     @Override
@@ -2423,6 +2430,10 @@ public class NumberPicker extends LinearLayout {
         mFadingEdgeEnabled = fadingEdgeEnabled;
     }
 
+    public void setFadingEdgeStrength(float strength) {
+        mFadingEdgeStrength = strength;
+    }
+
     public void setScrollerEnabled(boolean scrollerEnabled) {
         mScrollerEnabled = scrollerEnabled;
     }
@@ -2565,6 +2576,10 @@ public class NumberPicker extends LinearLayout {
 
     public boolean isFadingEdgeEnabled() {
         return mFadingEdgeEnabled;
+    }
+
+    public float getFadingEdgeStrength() {
+        return mFadingEdgeStrength;
     }
 
     public boolean isScrollerEnabled() {

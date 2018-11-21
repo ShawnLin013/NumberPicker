@@ -11,6 +11,7 @@
         <attr name="np_dividerThickness" format="dimension" />
         <attr name="np_formatter" format="string" />
         <attr name="np_fadingEdgeEnabled" format="boolean" />
+        <attr name="np_fadingEdgeStrength" format="float" />
         <attr name="np_lineSpacingMultiplier" format="float" />
         <attr name="np_max" format="integer" />
         <attr name="np_max_fling_velocity_coefficient" format="integer" />
