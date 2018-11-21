@@ -76,9 +76,9 @@ public class NumberPicker extends LinearLayout {
     private static final long DEFAULT_LONG_PRESS_UPDATE_INTERVAL = 300;
 
     /**
-     * The coefficient by which to adjust (divide) the max fling velocity.
+     * The default coefficient by which to adjust (divide) the max fling velocity.
      */
-    private static final int SELECTOR_MAX_FLING_VELOCITY_ADJUSTMENT = 8;
+    private static final int DEFAULT_MAX_FLING_VELOCITY_COEFFICIENT = 8;
 
     /**
      * The the duration for adjusting the selector wheel.
@@ -567,14 +567,24 @@ public class NumberPicker extends LinearLayout {
     private float mLineSpacingMultiplier = DEFAULT_LINE_SPACING_MULTIPLIER;
 
     /**
+     * The coefficient by which to adjust (divide) the max fling velocity.
+     */
+    private int mMaxFlingVelocityCoefficient = DEFAULT_MAX_FLING_VELOCITY_COEFFICIENT;
+
+    /**
      * The context of this widget.
      */
     private Context mContext;
 
     /**
-     * Number formatter for current locale
+     * The number formatter for current locale.
      */
     private NumberFormat mNumberFormatter;
+
+    /**
+     * The view configuration of this widget.
+     */
+    private ViewConfiguration mViewConfiguration;
 
     /**
      * Interface to listen for changes of the current value.
@@ -731,6 +741,9 @@ public class NumberPicker extends LinearLayout {
                 mWheelItemCount);
         mLineSpacingMultiplier = attributes.getFloat(
                 R.styleable.NumberPicker_np_lineSpacingMultiplier, mLineSpacingMultiplier);
+        mMaxFlingVelocityCoefficient = attributes.getInt(
+                R.styleable.NumberPicker_np_max_fling_velocity_coefficient,
+                mMaxFlingVelocityCoefficient);
 
         // By default Linearlayout that we extend is not drawn. This is
         // its draw() method is not called but dispatchDraw() is called
@@ -787,11 +800,11 @@ public class NumberPicker extends LinearLayout {
         }
 
         // initialize constants
-        ViewConfiguration configuration = ViewConfiguration.get(context);
-        mTouchSlop = configuration.getScaledTouchSlop();
-        mMinimumFlingVelocity = configuration.getScaledMinimumFlingVelocity();
-        mMaximumFlingVelocity = configuration.getScaledMaximumFlingVelocity()
-                / SELECTOR_MAX_FLING_VELOCITY_ADJUSTMENT;
+        mViewConfiguration = ViewConfiguration.get(context);
+        mTouchSlop = mViewConfiguration.getScaledTouchSlop();
+        mMinimumFlingVelocity = mViewConfiguration.getScaledMinimumFlingVelocity();
+        mMaximumFlingVelocity = mViewConfiguration.getScaledMaximumFlingVelocity()
+                / mMaxFlingVelocityCoefficient;
 
         // create the fling and adjust scrollers
         mFlingScroller = new Scroller(context, null, true);
@@ -2508,6 +2521,12 @@ public class NumberPicker extends LinearLayout {
         mLineSpacingMultiplier = multiplier;
     }
 
+    public void setMaxFlingVelocityCoefficient(int coefficient) {
+        mMaxFlingVelocityCoefficient = coefficient;
+        mMaximumFlingVelocity = mViewConfiguration.getScaledMaximumFlingVelocity()
+                / mMaxFlingVelocityCoefficient;
+    }
+
     public boolean isHorizontalMode() {
         return getOrientation() == HORIZONTAL;
     }
@@ -2598,6 +2617,10 @@ public class NumberPicker extends LinearLayout {
 
     public float getLineSpacingMultiplier() {
         return mLineSpacingMultiplier;
+    }
+
+    public int getMaxFlingVelocityCoefficient() {
+        return mMaxFlingVelocityCoefficient;
     }
 
 }
