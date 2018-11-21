@@ -533,6 +533,11 @@ public class NumberPicker extends LinearLayout {
     private int mLastHandledDownDpadKeyCode = -1;
 
     /**
+     * If true then the selector wheel is hidden until the picker has focus.
+     */
+    private boolean mHideWheelUntilFocused;
+
+    /**
      * The width of this widget.
      */
     private float mWidth;
@@ -756,6 +761,8 @@ public class NumberPicker extends LinearLayout {
         mMaxFlingVelocityCoefficient = attributes.getInt(
                 R.styleable.NumberPicker_np_max_fling_velocity_coefficient,
                 mMaxFlingVelocityCoefficient);
+        mHideWheelUntilFocused = attributes.getBoolean(
+                R.styleable.NumberPicker_np_hideWheelUntilFocused, false);
 
         // By default Linearlayout that we extend is not drawn. This is
         // its draw() method is not called but dispatchDraw() is called
@@ -1111,8 +1118,8 @@ public class NumberPicker extends LinearLayout {
             case KeyEvent.KEYCODE_DPAD_UP:
                 switch (event.getAction()) {
                     case KeyEvent.ACTION_DOWN:
-                        if (mWrapSelectorWheel || (keyCode == KeyEvent.KEYCODE_DPAD_DOWN)
-                                ? getValue() < getMaxValue() : getValue() > getMinValue()) {
+                        if (mWrapSelectorWheel || ((keyCode == KeyEvent.KEYCODE_DPAD_DOWN)
+                                ? getValue() < getMaxValue() : getValue() > getMinValue())) {
                             requestFocus();
                             mLastHandledDownDpadKeyCode = keyCode;
                             removeAllCallbacks();
@@ -1658,6 +1665,7 @@ public class NumberPicker extends LinearLayout {
         // save canvas
         canvas.save();
 
+        final boolean showSelectorWheel = mHideWheelUntilFocused ? hasFocus() : true;
         float x, y;
         if (isHorizontalMode()) {
             x = mCurrentScrollOffset;
@@ -1698,7 +1706,8 @@ public class NumberPicker extends LinearLayout {
             // item. Otherwise, if the user starts editing the text via the
             // IME he may see a dimmed version of the old value intermixed
             // with the new one.
-            if (i != mWheelMiddleItemIndex || mSelectedText.getVisibility() != VISIBLE) {
+            if ((showSelectorWheel && i != mWheelMiddleItemIndex)
+                    || (i == mWheelMiddleItemIndex && mSelectedText.getVisibility() != VISIBLE)) {
                 float textY = y;
                 if (!isHorizontalMode()) {
                     textY += getPaintCenterY(mSelectorWheelPaint.getFontMetrics());
@@ -1717,7 +1726,7 @@ public class NumberPicker extends LinearLayout {
         canvas.restore();
 
         // draw the dividers
-        if (mDividerDrawable != null) {
+        if (showSelectorWheel && mDividerDrawable != null) {
             if (isHorizontalMode()) {
                 final int bottom = getBottom();
 
