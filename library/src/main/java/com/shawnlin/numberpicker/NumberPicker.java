@@ -14,6 +14,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.NumberKeyListener;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -95,14 +96,14 @@ public class NumberPicker extends LinearLayout {
     private static final float FADING_EDGE_STRENGTH = 0.9f;
 
     /**
-     * The default unscaled height of the selection divider.
+     * The default unscaled height of the divider.
      */
-    private static final int UNSCALED_DEFAULT_SELECTION_DIVIDER_THICKNESS = 2;
+    private static final int UNSCALED_DEFAULT_DIVIDER_THICKNESS = 2;
 
     /**
-     * The default unscaled distance between the selection dividers.
+     * The default unscaled distance between the dividers.
      */
-    private static final int UNSCALED_DEFAULT_SELECTION_DIVIDERS_DISTANCE = 48;
+    private static final int UNSCALED_DEFAULT_DIVIDER_DISTANCE = 48;
 
     /**
      * Constant for unspecified size.
@@ -483,47 +484,47 @@ public class NumberPicker extends LinearLayout {
     /**
      * Divider for showing item to be selected while scrolling
      */
-    private Drawable mSelectionDivider;
+    private Drawable mDividerDrawable;
 
     /**
-     * The color of the selection divider.
+     * The color of the divider.
      */
-    private int mSelectionDividerColor = DEFAULT_DIVIDER_COLOR;
+    private int mDividerColor = DEFAULT_DIVIDER_COLOR;
 
     /**
-     * The distance between the two selection dividers.
+     * The distance between the two dividers.
      */
-    private int mSelectionDividersDistance;
+    private int mDividerDistance;
 
     /**
-     * The thickness of the selection divider.
+     * The thickness of the divider.
      */
-    private int mSelectionDividerThickness;
+    private int mDividerThickness;
+
+    /**
+     * The top of the top divider.
+     */
+    private int mTopDividerTop;
+
+    /**
+     * The bottom of the bottom divider.
+     */
+    private int mBottomDividerBottom;
+
+    /**
+     * The left of the top divider.
+     */
+    private int mLeftDividerLeft;
+
+    /**
+     * The right of the right divider.
+     */
+    private int mRightDividerRight;
 
     /**
      * The current scroll state of the number picker.
      */
     private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
-
-    /**
-     * The top of the top selection divider.
-     */
-    private int mTopSelectionDividerTop;
-
-    /**
-     * The bottom of the bottom selection divider.
-     */
-    private int mBottomSelectionDividerBottom;
-
-    /**
-     * The left of the top selection divider.
-     */
-    private int mLeftOfSelectionDividerLeft;
-
-    /**
-     * The right of the bottom selection divider.
-     */
-    private int mRightOfSelectionDividerRight;
 
     /**
      * The keycode of the last handled DPAD down event.
@@ -670,23 +671,20 @@ public class NumberPicker extends LinearLayout {
         TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.NumberPicker,
                 defStyle, 0);
 
-        mSelectionDivider = ContextCompat.getDrawable(context,
-                R.drawable.np_numberpicker_selection_divider);
+        mDividerDrawable = ContextCompat.getDrawable(context, R.drawable.np_numberpicker_divider);
 
-        mSelectionDividerColor = attributes.getColor(R.styleable.NumberPicker_np_dividerColor,
-                mSelectionDividerColor);
+        mDividerColor = attributes.getColor(R.styleable.NumberPicker_np_dividerColor,
+                mDividerColor);
 
-        final int defSelectionDividerDistance = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDERS_DISTANCE,
-                getResources().getDisplayMetrics());
-        mSelectionDividersDistance = attributes.getDimensionPixelSize(
-                R.styleable.NumberPicker_np_dividerDistance, defSelectionDividerDistance);
-
-        final int defSelectionDividerThickness = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDER_THICKNESS,
-                getResources().getDisplayMetrics());
-        mSelectionDividerThickness = attributes.getDimensionPixelSize(
-                R.styleable.NumberPicker_np_dividerThickness, defSelectionDividerThickness);
+        final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        final int defDividerDistance = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                UNSCALED_DEFAULT_DIVIDER_DISTANCE, displayMetrics);
+        final int defDividerThickness = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                UNSCALED_DEFAULT_DIVIDER_THICKNESS, displayMetrics);
+        mDividerDistance = attributes.getDimensionPixelSize(
+                R.styleable.NumberPicker_np_dividerDistance, defDividerDistance);
+        mDividerThickness = attributes.getDimensionPixelSize(
+                R.styleable.NumberPicker_np_dividerThickness, defDividerThickness);
 
         mOrder = attributes.getInt(R.styleable.NumberPicker_np_order, ASCENDING);
         mOrientation = attributes.getInt(R.styleable.NumberPicker_np_orientation, VERTICAL);
@@ -769,7 +767,7 @@ public class NumberPicker extends LinearLayout {
         setMaxValue(mMaxValue);
         setMinValue(mMinValue);
 
-        setDividerColor(mSelectionDividerColor);
+        setDividerColor(mDividerColor);
 
         setWheelItemCount(mWheelItemCount);
 
@@ -830,15 +828,13 @@ public class NumberPicker extends LinearLayout {
             initializeSelectorWheel();
             initializeFadingEdges();
 
-            final int dividerDistance = 2 * mSelectionDividerThickness + mSelectionDividersDistance;
+            final int dividerDistance = 2 * mDividerThickness + mDividerDistance;
             if (isHorizontalMode()) {
-                mLeftOfSelectionDividerLeft = (getWidth() - mSelectionDividersDistance) / 2
-                        - mSelectionDividerThickness;
-                mRightOfSelectionDividerRight = mLeftOfSelectionDividerLeft + dividerDistance;
+                mLeftDividerLeft = (getWidth() - mDividerDistance) / 2 - mDividerThickness;
+                mRightDividerRight = mLeftDividerLeft + dividerDistance;
             } else {
-                mTopSelectionDividerTop = (getHeight() - mSelectionDividersDistance) / 2
-                        - mSelectionDividerThickness;
-                mBottomSelectionDividerBottom = mTopSelectionDividerTop + dividerDistance;
+                mTopDividerTop = (getHeight() - mDividerDistance) / 2 - mDividerThickness;
+                mBottomDividerBottom = mTopDividerTop + dividerDistance;
             }
         }
     }
@@ -913,10 +909,11 @@ public class NumberPicker extends LinearLayout {
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
                 removeAllCallbacks();
+                // Make sure we support flinging inside scrollables.
+                getParent().requestDisallowInterceptTouchEvent(true);
+
                 if (isHorizontalMode()) {
                     mLastDownOrMoveEventX = mLastDownEventX = event.getX();
-                    // Make sure we support flinging inside scrollables.
-                    getParent().requestDisallowInterceptTouchEvent(true);
                     if (!mFlingScroller.isFinished()) {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
@@ -924,23 +921,18 @@ public class NumberPicker extends LinearLayout {
                     } else if (!mAdjustScroller.isFinished()) {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
-                    } else if (mLastDownEventX >= mLeftOfSelectionDividerLeft
-                        && mLastDownEventX <= mRightOfSelectionDividerRight) {
+                    } else if (mLastDownEventX >= mLeftDividerLeft
+                            && mLastDownEventX <= mRightDividerRight) {
                         if (mOnClickListener != null) {
                             mOnClickListener.onClick(this);
                         }
-                    } else if (mLastDownEventX < mLeftOfSelectionDividerLeft) {
-                        postChangeCurrentByOneFromLongPress(false,
-                                ViewConfiguration.getLongPressTimeout());
-                    } else if (mLastDownEventX > mRightOfSelectionDividerRight) {
-                        postChangeCurrentByOneFromLongPress(true,
-                                ViewConfiguration.getLongPressTimeout());
+                    } else if (mLastDownEventX < mLeftDividerLeft) {
+                        postChangeCurrentByOneFromLongPress(false);
+                    } else if (mLastDownEventX > mRightDividerRight) {
+                        postChangeCurrentByOneFromLongPress(true);
                     }
-                    return true;
                 } else {
                     mLastDownOrMoveEventY = mLastDownEventY = event.getY();
-                    // Make sure we support flinging inside scrollables.
-                    getParent().requestDisallowInterceptTouchEvent(true);
                     if (!mFlingScroller.isFinished()) {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
@@ -948,20 +940,18 @@ public class NumberPicker extends LinearLayout {
                     } else if (!mAdjustScroller.isFinished()) {
                         mFlingScroller.forceFinished(true);
                         mAdjustScroller.forceFinished(true);
-                    } else if (mLastDownEventY >= mTopSelectionDividerTop
-                        && mLastDownEventY <= mBottomSelectionDividerBottom) {
+                    } else if (mLastDownEventY >= mTopDividerTop
+                            && mLastDownEventY <= mBottomDividerBottom) {
                         if (mOnClickListener != null) {
                             mOnClickListener.onClick(this);
                         }
-                    } else if (mLastDownEventY < mTopSelectionDividerTop) {
-                        postChangeCurrentByOneFromLongPress(false,
-                                ViewConfiguration.getLongPressTimeout());
-                    } else if (mLastDownEventY > mBottomSelectionDividerBottom) {
-                        postChangeCurrentByOneFromLongPress(true,
-                                ViewConfiguration.getLongPressTimeout());
+                    } else if (mLastDownEventY < mTopDividerTop) {
+                        postChangeCurrentByOneFromLongPress(false);
+                    } else if (mLastDownEventY > mBottomDividerBottom) {
+                        postChangeCurrentByOneFromLongPress(true);
                     }
-                    return true;
                 }
+                return true;
             }
         }
         return false;
@@ -1566,24 +1556,28 @@ public class NumberPicker extends LinearLayout {
         tryComputeMaxWidth();
     }
 
+    private float getFadingEdgeStrength(boolean isHorizontalMode) {
+        return isHorizontalMode && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
+    }
+
     @Override
     protected float getTopFadingEdgeStrength() {
-        return !isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
+        return getFadingEdgeStrength(!isHorizontalMode());
     }
 
     @Override
     protected float getBottomFadingEdgeStrength() {
-        return !isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
+        return getFadingEdgeStrength(!isHorizontalMode());
     }
 
     @Override
     protected float getLeftFadingEdgeStrength() {
-        return isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
+        return getFadingEdgeStrength(isHorizontalMode());
     }
 
     @Override
     protected float getRightFadingEdgeStrength() {
-        return isHorizontalMode() && mFadingEdgeEnabled ? FADING_EDGE_STRENGTH : 0;
+        return getFadingEdgeStrength(isHorizontalMode());
     }
 
     @Override
@@ -1602,15 +1596,13 @@ public class NumberPicker extends LinearLayout {
             x = mCurrentScrollOffset;
             y = mSelectedText.getBaseline() + mSelectedText.getTop();
             if (mRealWheelItemCount < DEFAULT_WHEEL_ITEM_COUNT) {
-                canvas.clipRect(mLeftOfSelectionDividerLeft, 0, mRightOfSelectionDividerRight,
-                        getBottom());
+                canvas.clipRect(mLeftDividerLeft, 0, mRightDividerRight, getBottom());
             }
         } else {
             x = (getRight() - getLeft()) / 2;
             y = mCurrentScrollOffset;
             if (mRealWheelItemCount < DEFAULT_WHEEL_ITEM_COUNT) {
-                canvas.clipRect(0, mTopSelectionDividerTop, getRight(),
-                        mBottomSelectionDividerBottom);
+                canvas.clipRect(0, mTopDividerTop, getRight(), mBottomDividerBottom);
             }
         }
 
@@ -1657,32 +1649,36 @@ public class NumberPicker extends LinearLayout {
         // restore canvas
         canvas.restore();
 
-        // draw the selection dividers
-        if (mSelectionDivider != null) {
+        // draw the dividers
+        if (mDividerDrawable != null) {
             if (isHorizontalMode()) {
+                final int bottom = getBottom();
+
                 // draw the left divider
-                int leftOfLeftDivider = mLeftOfSelectionDividerLeft;
-                int rightOfLeftDivider = leftOfLeftDivider + mSelectionDividerThickness;
-                mSelectionDivider.setBounds(leftOfLeftDivider, 0, rightOfLeftDivider, getBottom());
-                mSelectionDivider.draw(canvas);
+                final int leftOfLeftDivider = mLeftDividerLeft;
+                final int rightOfLeftDivider = leftOfLeftDivider + mDividerThickness;
+                mDividerDrawable.setBounds(leftOfLeftDivider, 0, rightOfLeftDivider, bottom);
+                mDividerDrawable.draw(canvas);
 
                 // draw the right divider
-                int rightOfRightDivider = mRightOfSelectionDividerRight;
-                int leftOfRightDivider = rightOfRightDivider - mSelectionDividerThickness;
-                mSelectionDivider.setBounds(leftOfRightDivider, 0, rightOfRightDivider, getBottom());
-                mSelectionDivider.draw(canvas);
+                final int rightOfRightDivider = mRightDividerRight;
+                final int leftOfRightDivider = rightOfRightDivider - mDividerThickness;
+                mDividerDrawable.setBounds(leftOfRightDivider, 0, rightOfRightDivider, bottom);
+                mDividerDrawable.draw(canvas);
             } else {
+                final int right = getRight();
+
                 // draw the top divider
-                int topOfTopDivider = mTopSelectionDividerTop;
-                int bottomOfTopDivider = topOfTopDivider + mSelectionDividerThickness;
-                mSelectionDivider.setBounds(0, topOfTopDivider, getRight(), bottomOfTopDivider);
-                mSelectionDivider.draw(canvas);
+                final int topOfTopDivider = mTopDividerTop;
+                final int bottomOfTopDivider = topOfTopDivider + mDividerThickness;
+                mDividerDrawable.setBounds(0, topOfTopDivider, right, bottomOfTopDivider);
+                mDividerDrawable.draw(canvas);
 
                 // draw the bottom divider
-                int bottomOfBottomDivider = mBottomSelectionDividerBottom;
-                int topOfBottomDivider = bottomOfBottomDivider - mSelectionDividerThickness;
-                mSelectionDivider.setBounds(0, topOfBottomDivider, getRight(), bottomOfBottomDivider);
-                mSelectionDivider.draw(canvas);
+                final int bottomOfBottomDivider = mBottomDividerBottom;
+                final int topOfBottomDivider = bottomOfBottomDivider - mDividerThickness;
+                mDividerDrawable.setBounds(0, topOfBottomDivider, right, bottomOfBottomDivider);
+                mDividerDrawable.draw(canvas);
             }
         }
     }
@@ -2090,6 +2086,15 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
+     * Posts a command for changing the current value by one.
+     *
+     * @param increment Whether to increment or decrement the value.
+     */
+    private void postChangeCurrentByOneFromLongPress(boolean increment) {
+        postChangeCurrentByOneFromLongPress(increment, ViewConfiguration.getLongPressTimeout());
+    }
+
+    /**
      * Removes the command for changing the current value by one.
      */
     private void removeChangeCurrentByOneFromLongPress() {
@@ -2341,8 +2346,8 @@ public class NumberPicker extends LinearLayout {
     }
 
     public void setDividerColor(@ColorInt int color) {
-        mSelectionDividerColor = color;
-        mSelectionDivider = new ColorDrawable(color);
+        mDividerColor = color;
+        mDividerDrawable = new ColorDrawable(color);
     }
 
     public void setDividerColorResource(@ColorRes int colorId) {
@@ -2350,11 +2355,19 @@ public class NumberPicker extends LinearLayout {
     }
 
     public void setDividerDistance(int distance) {
-        mSelectionDividersDistance = (int) dpToPx(distance);
+        mDividerDistance = distance;
+    }
+
+    public void setDividerDistanceResource(@DimenRes int dimenId) {
+        setDividerDistance(getResources().getDimensionPixelSize(dimenId));
     }
 
     public void setDividerThickness(int thickness) {
-        mSelectionDividerThickness = (int) dpToPx(thickness);
+        mDividerThickness = thickness;
+    }
+
+    public void setDividerThicknessResource(@DimenRes int dimenId) {
+        setDividerThickness(getResources().getDimensionPixelSize(dimenId));
     }
 
     /**
@@ -2504,15 +2517,15 @@ public class NumberPicker extends LinearLayout {
     }
 
     public int getDividerColor() {
-        return mSelectionDividerColor;
+        return mDividerColor;
     }
 
     public float getDividerDistance() {
-        return pxToDp(mSelectionDividersDistance);
+        return pxToDp(mDividerDistance);
     }
 
     public float getDividerThickness() {
-        return pxToDp(mSelectionDividerThickness);
+        return pxToDp(mDividerThickness);
     }
 
     public int getOrder() {
