@@ -1276,6 +1276,48 @@ public class NumberPicker extends LinearLayout {
         }
     }
 
+    private int computeScrollOffset(boolean isHorizontalMode) {
+        return isHorizontalMode ? mCurrentScrollOffset : 0;
+    }
+
+    private int computeScrollRange(boolean isHorizontalMode) {
+        return isHorizontalMode ? (mMaxValue - mMinValue + 1) * mSelectorElementSize : 0;
+    }
+
+    private int computeScrollExtent(boolean isHorizontalMode) {
+        return isHorizontalMode ? getWidth() : getHeight();
+    }
+
+    @Override
+    protected int computeHorizontalScrollOffset() {
+        return computeScrollOffset(isHorizontalMode());
+    }
+
+    @Override
+    protected int computeHorizontalScrollRange() {
+        return computeScrollRange(isHorizontalMode());
+    }
+
+    @Override
+    protected int computeHorizontalScrollExtent() {
+        return computeScrollExtent(isHorizontalMode());
+    }
+
+    @Override
+    protected int computeVerticalScrollOffset() {
+        return computeScrollOffset(!isHorizontalMode());
+    }
+
+    @Override
+    protected int computeVerticalScrollRange() {
+        return computeScrollRange(!isHorizontalMode());
+    }
+
+    @Override
+    protected int computeVerticalScrollExtent() {
+        return computeScrollExtent(isHorizontalMode());
+    }
+
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
