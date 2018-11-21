@@ -2229,7 +2229,7 @@ public class NumberPicker extends LinearLayout {
             removeCallbacks(mChangeCurrentByOneFromLongPressCommand);
         }
         if (mSetSelectionCommand != null) {
-            removeCallbacks(mSetSelectionCommand);
+            mSetSelectionCommand.cancel();
         }
     }
 
@@ -2266,18 +2266,15 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
-     * Posts an {@link SetSelectionCommand} from the given <code>selectionStart
-     * </code> to <code>selectionEnd</code>.
+     * Posts a {@link SetSelectionCommand} from the given
+     * {@code selectionStart} to {@code selectionEnd}.
      */
     private void postSetSelectionCommand(int selectionStart, int selectionEnd) {
         if (mSetSelectionCommand == null) {
-            mSetSelectionCommand = new SetSelectionCommand();
+            mSetSelectionCommand = new SetSelectionCommand(mSelectedText);
         } else {
-            removeCallbacks(mSetSelectionCommand);
+            mSetSelectionCommand.post(selectionStart, selectionEnd);
         }
-        mSetSelectionCommand.mSelectionStart = selectionStart;
-        mSetSelectionCommand.mSelectionEnd = selectionEnd;
-        post(mSetSelectionCommand);
     }
 
     /**
@@ -2324,6 +2321,12 @@ public class NumberPicker extends LinearLayout {
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest,
                                    int dstart, int dend) {
+            // We don't know what the output will be, so always cancel any
+            // pending set selection command.
+            if (mSetSelectionCommand != null) {
+                mSetSelectionCommand.cancel();
+            }
+
             if (mDisplayedValues == null) {
                 CharSequence filtered = super.filter(source, start, end, dest, dstart, dend);
                 if (filtered == null) {
@@ -2399,13 +2402,39 @@ public class NumberPicker extends LinearLayout {
     /**
      * Command for setting the input text selection.
      */
-    class SetSelectionCommand implements Runnable {
-        private int mSelectionStart;
+    private static class SetSelectionCommand implements Runnable {
 
+        private final EditText mInputText;
+
+        private int mSelectionStart;
         private int mSelectionEnd;
 
+        /** Whether this runnable is currently posted. */
+        private boolean mPosted;
+
+        public SetSelectionCommand(EditText inputText) {
+            mInputText = inputText;
+        }
+
+        public void post(int selectionStart, int selectionEnd) {
+            mSelectionStart = selectionStart;
+            mSelectionEnd = selectionEnd;
+            if (!mPosted) {
+                mInputText.post(this);
+                mPosted = true;
+            }
+        }
+
+        public void cancel() {
+            if (mPosted) {
+                mInputText.removeCallbacks(this);
+                mPosted = false;
+            }
+        }
+
         public void run() {
-            mSelectedText.setSelection(mSelectionStart, mSelectionEnd);
+            mPosted = false;
+            mInputText.setSelection(mSelectionStart, mSelectionEnd);
         }
     }
 
