@@ -1,7 +1,7 @@
 # Number Picker
 
 The android library that provides a simple and customizable NumberPicker.
-It's based on [android.widget.NumberPicker](https://android.googlesource.com/platform/frameworks/base/+/47fb191/core/java/android/widget/NumberPicker.java).
+It's based on [android.widget.NumberPicker](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/widget/NumberPicker.java).
 
 [![Platform](http://img.shields.io/badge/platform-android-brightgreen.svg?style=flat)](http://developer.android.com/index.html) [![Language](http://img.shields.io/badge/language-java-orange.svg?style=flat)](http://www.oracle.com/technetwork/java/javase/downloads/index.html) [![](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-NumberPicker-green.svg?style=true)](https://android-arsenal.com/details/1/3718) [![API](https://img.shields.io/badge/API-15%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=15) [![Download](https://api.bintray.com/packages/shawnlin013/maven/number-picker/images/download.svg)](https://bintray.com/shawnlin013/maven/number-picker/_latestVersion) [![CircleCI](https://circleci.com/gh/ShawnLin013/NumberPicker.svg?style=svg)](https://circleci.com/gh/ShawnLin013/NumberPicker)
 
@@ -126,9 +126,12 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_dividerDistance|The distance between the two selection dividers.|
 |np_dividerThickness|The thickness of the selection divider.|
 |np_fadingEdgeEnabled|Flag whether the fading edge should enabled.|
+|np_fadingEdgeStrength|The strength of fading edge while drawing the selector.|
 |np_formatter|The formatter of the numbers.|
+|np_hideWheelUntilFocused|Flag whether the selector wheel should hidden until the picker has focus.|
 |np_lineSpacingMultiplier|The line spacing multiplier for the multiple lines.|
 |np_max|The max value of this widget.|
+|np_max_fling_velocity_coefficient|The coefficient to adjust (divide) the max fling velocity.|
 |np_min|The min value of this widget.|
 |np_order|The order of this widget. Default is ascending.|
 |np_orientation|The orientation of this widget. Default is vertical.|

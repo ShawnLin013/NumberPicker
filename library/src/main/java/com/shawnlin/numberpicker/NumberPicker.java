@@ -79,7 +79,7 @@ public class NumberPicker extends LinearLayout {
     private static final long DEFAULT_LONG_PRESS_UPDATE_INTERVAL = 300;
 
     /**
-     * The default coefficient by which to adjust (divide) the max fling velocity.
+     * The default coefficient to adjust (divide) the max fling velocity.
      */
     private static final int DEFAULT_MAX_FLING_VELOCITY_COEFFICIENT = 8;
 
@@ -94,7 +94,7 @@ public class NumberPicker extends LinearLayout {
     private static final int SNAP_SCROLL_DURATION = 300;
 
     /**
-     * The default strength of fading in the top and bottom while drawing the selector.
+     * The default strength of fading edge while drawing the selector.
      */
     private static final float DEFAULT_FADING_EDGE_STRENGTH = 0.9f;
 
@@ -540,7 +540,7 @@ public class NumberPicker extends LinearLayout {
     private int mLastHandledDownDpadKeyCode = -1;
 
     /**
-     * If true then the selector wheel is hidden until the picker has focus.
+     * Flag whether the selector wheel should hidden until the picker has focus.
      */
     private boolean mHideWheelUntilFocused;
 
@@ -570,7 +570,7 @@ public class NumberPicker extends LinearLayout {
     private boolean mFadingEdgeEnabled = true;
 
     /**
-     * The strength of fading in the top and bottom while drawing the selector.
+     * The strength of fading edge while drawing the selector.
      */
     private float mFadingEdgeStrength = DEFAULT_FADING_EDGE_STRENGTH;
 
@@ -585,7 +585,7 @@ public class NumberPicker extends LinearLayout {
     private float mLineSpacingMultiplier = DEFAULT_LINE_SPACING_MULTIPLIER;
 
     /**
-     * The coefficient by which to adjust (divide) the max fling velocity.
+     * The coefficient to adjust (divide) the max fling velocity.
      */
     private int mMaxFlingVelocityCoefficient = DEFAULT_MAX_FLING_VELOCITY_COEFFICIENT;
 
