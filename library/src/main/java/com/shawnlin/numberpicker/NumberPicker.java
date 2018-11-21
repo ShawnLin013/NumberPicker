@@ -44,7 +44,7 @@ import androidx.core.content.ContextCompat;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * A widget that enables the user to select a number form a predefined range.
+ * A widget that enables the user to select a number from a predefined range.
  */
 public class NumberPicker extends LinearLayout {
 
