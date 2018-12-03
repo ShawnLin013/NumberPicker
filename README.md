@@ -4,6 +4,7 @@ The android library that provides a simple and customizable NumberPicker.
 It's based on [android.widget.NumberPicker](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/widget/NumberPicker.java).
 
 [![Platform](http://img.shields.io/badge/platform-android-brightgreen.svg?style=flat)](http://developer.android.com/index.html) [![Language](http://img.shields.io/badge/language-java-orange.svg?style=flat)](http://www.oracle.com/technetwork/java/javase/downloads/index.html) [![](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-NumberPicker-green.svg?style=true)](https://android-arsenal.com/details/1/3718) [![API](https://img.shields.io/badge/API-15%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=15) [![Download](https://api.bintray.com/packages/shawnlin013/maven/number-picker/images/download.svg)](https://bintray.com/shawnlin013/maven/number-picker/_latestVersion) [![CircleCI](https://circleci.com/gh/ShawnLin013/NumberPicker.svg?style=svg)](https://circleci.com/gh/ShawnLin013/NumberPicker)
+[![Backers on Open Collective](https://opencollective.com/NumberPicker/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/NumberPicker/sponsors/badge.svg)](#sponsors) 
 
 <img src="https://github.com/ShawnLin013/NumberPicker/blob/master/screenshot/number-picker-theme.png">
 
@@ -172,6 +173,36 @@ dependencies {
 Thank you to all our backers! 🙏
 
 <a href='https://ko-fi.com/shawnlin' target='_blank'><img height='48' style='border:0px;height:48px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/ShawnLin013/NumberPicker/graphs/contributors"><img src="https://opencollective.com/NumberPicker/contributors.svg?width=890&button=false" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/NumberPicker#backer)]
+
+<a href="https://opencollective.com/NumberPicker#backers" target="_blank"><img src="https://opencollective.com/NumberPicker/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/NumberPicker#sponsor)]
+
+<a href="https://opencollective.com/NumberPicker/sponsor/0/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/1/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/2/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/3/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/4/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/5/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/6/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/7/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/8/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/NumberPicker/sponsor/9/website" target="_blank"><img src="https://opencollective.com/NumberPicker/sponsor/9/avatar.svg"></a>
+
+
 
 ## License
 
