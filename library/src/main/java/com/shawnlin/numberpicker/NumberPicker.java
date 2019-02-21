@@ -1538,8 +1538,11 @@ public class NumberPicker extends LinearLayout {
      * value) gets updated.
      */
     private void updateWrapSelectorWheel() {
-        final boolean wrappingAllowed = (mMaxValue - mMinValue) >= mSelectorIndices.length;
-        mWrapSelectorWheel = wrappingAllowed && mWrapSelectorWheelPreferred;
+        mWrapSelectorWheel = isWrappingAllowed() && mWrapSelectorWheelPreferred;
+    }
+
+    private boolean isWrappingAllowed() {
+        return mMaxValue - mMinValue >= mSelectorIndices.length - 1;
     }
 
     /**
@@ -1592,8 +1595,7 @@ public class NumberPicker extends LinearLayout {
         if (mMinValue > mValue) {
             mValue = mMinValue;
         }
-        boolean wrapSelectorWheel = mMaxValue - mMinValue > mSelectorIndices.length;
-        setWrapSelectorWheel(wrapSelectorWheel);
+        setWrapSelectorWheel(isWrappingAllowed());
         initializeSelectorWheelIndices();
         updateInputTextView();
         tryComputeMaxWidth();
