@@ -131,7 +131,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_hideWheelUntilFocused|Flag whether the selector wheel should hidden until the picker has focus.|
 |np_lineSpacingMultiplier|The line spacing multiplier for the multiple lines.|
 |np_max|The max value of this widget.|
-|np_max_fling_velocity_coefficient|The coefficient to adjust (divide) the max fling velocity.|
+|np_maxFlingVelocityCoefficient|The coefficient to adjust (divide) the max fling velocity.|
 |np_min|The min value of this widget.|
 |np_order|The order of this widget. Default is ascending.|
 |np_orientation|The orientation of this widget. Default is vertical.|

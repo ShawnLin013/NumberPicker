@@ -16,7 +16,7 @@
         <attr name="np_hideWheelUntilFocused" format="boolean" />
         <attr name="np_lineSpacingMultiplier" format="float" />
         <attr name="np_max" format="integer" />
-        <attr name="np_max_fling_velocity_coefficient" format="integer" />
+        <attr name="np_maxFlingVelocityCoefficient" format="integer" />
         <attr name="np_min" format="integer" />
         <attr name="np_order" format="enum">
             <enum name="ascending" value="0" />

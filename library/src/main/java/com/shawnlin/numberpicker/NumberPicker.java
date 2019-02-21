@@ -775,7 +775,7 @@ public class NumberPicker extends LinearLayout {
         mLineSpacingMultiplier = attributes.getFloat(
                 R.styleable.NumberPicker_np_lineSpacingMultiplier, mLineSpacingMultiplier);
         mMaxFlingVelocityCoefficient = attributes.getInt(
-                R.styleable.NumberPicker_np_max_fling_velocity_coefficient,
+                R.styleable.NumberPicker_np_maxFlingVelocityCoefficient,
                 mMaxFlingVelocityCoefficient);
         mHideWheelUntilFocused = attributes.getBoolean(
                 R.styleable.NumberPicker_np_hideWheelUntilFocused, false);
