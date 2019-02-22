@@ -163,7 +163,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.shawnlin:number-picker:2.4.7'
+    compile 'com.shawnlin:number-picker:2.4.8'
 }
 ```
 
