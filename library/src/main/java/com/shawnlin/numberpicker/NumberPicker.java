@@ -2001,19 +2001,42 @@ public class NumberPicker extends LinearLayout {
         if (!moveToFinalScrollerPosition(mFlingScroller)) {
             moveToFinalScrollerPosition(mAdjustScroller);
         }
+        smoothScroll(increment, 1);
+    }
+
+    /**
+     * Starts a smooth scroll to wheel position.
+     *
+     * @param position The wheel position to scroll to.
+     */
+    public void smoothScrollToPosition(int position) {
+        final int currentPosition = getSelectorIndices()[mWheelMiddleItemIndex];
+        if (currentPosition == position) {
+            return;
+        }
+        smoothScroll(position > currentPosition, Math.abs(position - currentPosition));
+    }
+
+    /**
+     * Starts a smooth scroll
+     *
+     * @param increment True to increment, false to decrement.
+     * @param steps The steps to scroll.
+     */
+    public void smoothScroll(boolean increment, int steps) {
         if (isHorizontalMode()) {
             mPreviousScrollerX = 0;
             if (increment) {
-                mFlingScroller.startScroll(0, 0, -mSelectorElementSize, 0, SNAP_SCROLL_DURATION);
+                mFlingScroller.startScroll(0, 0, -mSelectorElementSize * steps, 0, SNAP_SCROLL_DURATION);
             } else {
-                mFlingScroller.startScroll(0, 0, mSelectorElementSize, 0, SNAP_SCROLL_DURATION);
+                mFlingScroller.startScroll(0, 0, mSelectorElementSize * steps, 0, SNAP_SCROLL_DURATION);
             }
         } else {
             mPreviousScrollerY = 0;
             if (increment) {
-                mFlingScroller.startScroll(0, 0, 0, -mSelectorElementSize, SNAP_SCROLL_DURATION);
+                mFlingScroller.startScroll(0, 0, 0, -mSelectorElementSize * steps, SNAP_SCROLL_DURATION);
             } else {
-                mFlingScroller.startScroll(0, 0, 0, mSelectorElementSize, SNAP_SCROLL_DURATION);
+                mFlingScroller.startScroll(0, 0, 0, mSelectorElementSize * steps, SNAP_SCROLL_DURATION);
             }
         }
         invalidate();

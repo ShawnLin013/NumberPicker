@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        NumberPicker numberPicker = findViewById(R.id.number_picker);
+        final NumberPicker numberPicker = findViewById(R.id.number_picker);
 
         // Set divider color
         numberPicker.setDividerColor(ContextCompat.getColor(this, R.color.colorPrimary));
