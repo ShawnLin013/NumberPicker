@@ -177,9 +177,10 @@ public class NumberPicker extends LinearLayout {
 
         final Object[] mArgs = new Object[1];
 
-        Locale mLocale = Locale.getDefault();
+        Locale mLocale;
 
         TwoDigitFormatter() {
+            mLocale = Locale.getDefault();
             init(mLocale);
         }
 
