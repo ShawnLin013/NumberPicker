@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set formatter
         numberPicker.setFormatter(getString(R.string.number_picker_formatter));
-//        numberPicker.setFormatter(R.string.number_picker_formatter);
+        numberPicker.setFormatter(R.string.number_picker_formatter);
 
         // Set selected text color
         numberPicker.setSelectedTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
@@ -51,8 +51,7 @@ public class MainActivity extends AppCompatActivity {
         numberPicker.setTextSize(R.dimen.text_size);
 
         // Set typeface
-        numberPicker
-            .setTypeface(Typeface.create(getString(R.string.roboto_light), Typeface.NORMAL));
+        numberPicker.setTypeface(Typeface.create(getString(R.string.roboto_light), Typeface.NORMAL));
         numberPicker.setTypeface(getString(R.string.roboto_light), Typeface.NORMAL);
         numberPicker.setTypeface(getString(R.string.roboto_light));
         numberPicker.setTypeface(R.string.roboto_light, Typeface.NORMAL);
