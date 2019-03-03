@@ -4,14 +4,11 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-
-import com.shawnlin.numberpicker.NumberPicker;
-
-import java.util.Locale;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import com.shawnlin.numberpicker.NumberPicker;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,11 +29,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Set formatter
         numberPicker.setFormatter(getString(R.string.number_picker_formatter));
-        numberPicker.setFormatter(R.string.number_picker_formatter);
+//        numberPicker.setFormatter(R.string.number_picker_formatter);
 
         // Set selected text color
         numberPicker.setSelectedTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
         numberPicker.setSelectedTextColorResource(R.color.colorPrimary);
+
+        // Set locale
+        numberPicker.setLocale(new Locale("ar")); //comment this line to show the picker in english
 
         // Set selected text size
         numberPicker.setSelectedTextSize(getResources().getDimension(R.dimen.selected_text_size));
@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
         numberPicker.setTextSize(R.dimen.text_size);
 
         // Set typeface
-        numberPicker.setTypeface(Typeface.create(getString(R.string.roboto_light), Typeface.NORMAL));
+        numberPicker
+            .setTypeface(Typeface.create(getString(R.string.roboto_light), Typeface.NORMAL));
         numberPicker.setTypeface(getString(R.string.roboto_light), Typeface.NORMAL);
         numberPicker.setTypeface(getString(R.string.roboto_light));
         numberPicker.setTypeface(R.string.roboto_light, Typeface.NORMAL);
