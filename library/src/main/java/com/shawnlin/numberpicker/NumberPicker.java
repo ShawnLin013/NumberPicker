@@ -30,12 +30,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import androidx.annotation.CallSuper;
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -43,6 +37,12 @@ import androidx.annotation.DimenRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -1763,6 +1763,9 @@ public class NumberPicker extends LinearLayout {
             int selectorIndex = selectorIndices[isAscendingOrder()
                     ? i : selectorIndices.length - i - 1];
             String scrollSelectorValue = mSelectorIndexToStringCache.get(selectorIndex);
+            if (scrollSelectorValue == null) {
+                continue;
+            }
             // Do not draw the middle item if input is visible since the input
             // is shown only if the wheel is static and it covers the middle
             // item. Otherwise, if the user starts editing the text via the
@@ -1941,7 +1944,7 @@ public class NumberPicker extends LinearLayout {
         mSelectorIndexToStringCache.clear();
         int[] selectorIndices = getSelectorIndices();
         int current = getValue();
-        for (int i = 0; i < mSelectorIndices.length; i++) {
+        for (int i = 0; i < selectorIndices.length; i++) {
             int selectorIndex = current + (i - mWheelMiddleItemIndex);
             if (mWrapSelectorWheel) {
                 selectorIndex = getWrappedSelectorIndex(selectorIndex);
@@ -2187,6 +2190,10 @@ public class NumberPicker extends LinearLayout {
         } else {
             if (mDisplayedValues != null) {
                 int displayedValueIndex = selectorIndex - mMinValue;
+                if (displayedValueIndex >= mDisplayedValues.length) {
+                    cache.remove(selectorIndex);
+                    return;
+                }
                 scrollSelectorValue = mDisplayedValues[displayedValueIndex];
             } else {
                 scrollSelectorValue = formatNumber(selectorIndex);
