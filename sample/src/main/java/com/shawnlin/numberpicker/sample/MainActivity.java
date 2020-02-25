@@ -102,6 +102,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, String.format(Locale.US, "oldVal: %d, newVal: %d", oldVal, newVal));
             }
         });
+
+        // OnScrollListener
+        numberPicker.setOnScrollListener(new NumberPicker.OnScrollListener() {
+            @Override
+            public void onScrollStateChange(NumberPicker picker, int scrollState) {
+                if (scrollState == SCROLL_STATE_IDLE) {
+                    Log.d(TAG, String.format(Locale.US, "newVal: %d", picker.getValue()));
+                }
+            }
+        });
     }
 
 }
