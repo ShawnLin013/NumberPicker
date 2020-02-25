@@ -37,6 +37,7 @@
         <attr name="np_selectedTextSize" format="dimension" />
         <attr name="np_selectedTextStrikeThru" format="boolean" />
         <attr name="np_selectedTextUnderline" format="boolean" />
+        <attr name="np_selectedTypeface" format="string" />
         <attr name="np_textAlign" format="enum">
             <enum name="textAlignRight" value="0" />
             <enum name="textAlignCenter" value="1" />

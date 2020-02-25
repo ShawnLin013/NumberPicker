@@ -38,6 +38,13 @@ numberPicker.setSelectedTextColorResource(R.color.colorPrimary);
 numberPicker.setSelectedTextSize(getResources().getDimension(R.dimen.selected_text_size));
 numberPicker.setSelectedTextSize(R.dimen.selected_text_size);
 
+// Set selected typeface
+numberPicker.setSelectedTypeface(Typeface.create(getString(R.string.roboto_light), Typeface.NORMAL));
+numberPicker.setSelectedTypeface(getString(R.string.roboto_light), Typeface.NORMAL);
+numberPicker.setSelectedTypeface(getString(R.string.roboto_light));
+numberPicker.setSelectedTypeface(R.string.roboto_light, Typeface.NORMAL);
+numberPicker.setSelectedTypeface(R.string.roboto_light);
+
 // Set text color
 numberPicker.setTextColor(ContextCompat.getColor(this, R.color.dark_grey));
 numberPicker.setTextColorResource(R.color.dark_grey);
@@ -145,6 +152,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_selectedTextSize|The text size of the selected number.|
 |np_selectedTextStrikeThru|Flag whether the selected text should strikethroughed.|
 |np_selectedTextUnderline|Flag whether the selected text should underlined.|
+|np_selectedTypeface|The typeface of the selected numbers.|
 |np_textAlign|The text align of the numbers. Default is center.|
 |np_textColor|The text color of the numbers.|
 |np_textSize|The text size of the numbers.|

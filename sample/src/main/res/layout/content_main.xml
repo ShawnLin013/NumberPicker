@@ -34,6 +34,7 @@
         app:np_orientation="horizontal"
         app:np_selectedTextColor="@color/colorAccent"
         app:np_selectedTextSize="@dimen/selected_text_size"
+        app:np_selectedTypeface="@string/roboto_light"
         app:np_textColor="@color/colorAccent"
         app:np_textSize="@dimen/text_size"
         app:np_typeface="@string/roboto_light"

@@ -42,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
         numberPicker.setSelectedTextSize(getResources().getDimension(R.dimen.selected_text_size));
         numberPicker.setSelectedTextSize(R.dimen.selected_text_size);
 
+        // Set selected typeface
+        numberPicker.setSelectedTypeface(Typeface.create(getString(R.string.roboto_light), Typeface.NORMAL));
+        numberPicker.setSelectedTypeface(getString(R.string.roboto_light), Typeface.NORMAL);
+        numberPicker.setSelectedTypeface(getString(R.string.roboto_light));
+        numberPicker.setSelectedTypeface(R.string.roboto_light, Typeface.NORMAL);
+        numberPicker.setSelectedTypeface(R.string.roboto_light);
+
         // Set text color
         numberPicker.setTextColor(ContextCompat.getColor(this, R.color.dark_grey));
         numberPicker.setTextColorResource(R.color.dark_grey);

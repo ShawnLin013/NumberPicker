@@ -280,6 +280,11 @@ public class NumberPicker extends LinearLayout {
     private boolean mSelectedTextUnderline;
 
     /**
+     * The typeface of the selected text.
+     */
+    private Typeface mSelectedTypeface;
+
+    /**
      * The align of the text.
      */
     private int mTextAlign = DEFAULT_TEXT_ALIGN;
@@ -758,6 +763,8 @@ public class NumberPicker extends LinearLayout {
                 R.styleable.NumberPicker_np_selectedTextStrikeThru, mSelectedTextStrikeThru);
         mSelectedTextUnderline = attributes.getBoolean(
                 R.styleable.NumberPicker_np_selectedTextUnderline, mSelectedTextUnderline);
+        mSelectedTypeface = Typeface.create(attributes.getString(
+                R.styleable.NumberPicker_np_selectedTypeface), Typeface.NORMAL);
         mTextAlign = attributes.getInt(R.styleable.NumberPicker_np_textAlign, mTextAlign);
         mTextColor = attributes.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
         mTextSize = attributes.getDimension(R.styleable.NumberPicker_np_textSize,
@@ -815,6 +822,7 @@ public class NumberPicker extends LinearLayout {
         setTextSize(mTextSize);
         setSelectedTextSize(mSelectedTextSize);
         setTypeface(mTypeface);
+        setSelectedTypeface(mSelectedTypeface);
         setFormatter(mFormatter);
         updateInputTextView();
 
@@ -2676,6 +2684,36 @@ public class NumberPicker extends LinearLayout {
         mSelectedTextUnderline = underlineText;
     }
 
+    public void setSelectedTypeface(Typeface typeface) {
+        mSelectedTypeface = typeface;
+        if (mSelectedTypeface != null) {
+            mSelectorWheelPaint.setTypeface(mSelectedTypeface);
+        } else if (mTypeface != null) {
+            mSelectorWheelPaint.setTypeface(mTypeface);
+        } else {
+            mSelectorWheelPaint.setTypeface(Typeface.MONOSPACE);
+        }
+    }
+
+    public void setSelectedTypeface(String string, int style) {
+        if (TextUtils.isEmpty(string)) {
+            return;
+        }
+        setSelectedTypeface(Typeface.create(string, style));
+    }
+
+    public void setSelectedTypeface(String string) {
+        setSelectedTypeface(string, Typeface.NORMAL);
+    }
+
+    public void setSelectedTypeface(@StringRes int stringId, int style) {
+        setSelectedTypeface(getResources().getString(stringId), style);
+    }
+
+    public void setSelectedTypeface(@StringRes int stringId) {
+        setSelectedTypeface(stringId, Typeface.NORMAL);
+    }
+
     public void setTextAlign(@Align int align) {
         mTextAlign = align;
     }
@@ -2710,10 +2748,9 @@ public class NumberPicker extends LinearLayout {
         mTypeface = typeface;
         if (mTypeface != null) {
             mSelectedText.setTypeface(mTypeface);
-            mSelectorWheelPaint.setTypeface(mTypeface);
+            setSelectedTypeface(mSelectedTypeface);
         } else {
             mSelectedText.setTypeface(Typeface.MONOSPACE);
-            mSelectorWheelPaint.setTypeface(Typeface.MONOSPACE);
         }
     }
 
