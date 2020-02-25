@@ -590,6 +590,11 @@ public class NumberPicker extends LinearLayout {
     private int mMaxFlingVelocityCoefficient = DEFAULT_MAX_FLING_VELOCITY_COEFFICIENT;
 
     /**
+     * Flag whether the accessibility description enabled.
+     */
+    private boolean mAccessibilityDescriptionEnabled = true;
+
+    /**
      * The context of this widget.
      */
     private Context mContext;
@@ -779,6 +784,8 @@ public class NumberPicker extends LinearLayout {
                 mMaxFlingVelocityCoefficient);
         mHideWheelUntilFocused = attributes.getBoolean(
                 R.styleable.NumberPicker_np_hideWheelUntilFocused, false);
+        mAccessibilityDescriptionEnabled = attributes.getBoolean(
+                R.styleable.NumberPicker_np_accessibilityDescriptionEnabled, true);
 
         // By default Linearlayout that we extend is not drawn. This is
         // its draw() method is not called but dispatchDraw() is called
@@ -1990,6 +1997,10 @@ public class NumberPicker extends LinearLayout {
      * to the currently selected value
      */
     private void updateAccessibilityDescription() {
+        if (!mAccessibilityDescriptionEnabled) {
+            return;
+        }
+
         this.setContentDescription(String.valueOf(getValue()));
     }
 
@@ -2558,6 +2569,10 @@ public class NumberPicker extends LinearLayout {
         }
     }
 
+    public void setAccessibilityDescriptionEnabled(boolean enabled) {
+        mAccessibilityDescriptionEnabled = enabled;
+    }
+
     public void setDividerColor(@ColorInt int color) {
         mDividerColor = color;
         mDividerDrawable = new ColorDrawable(color);
@@ -2737,6 +2752,10 @@ public class NumberPicker extends LinearLayout {
 
     public boolean isAscendingOrder() {
         return getOrder() == ASCENDING;
+    }
+
+    public boolean isAccessibilityDescriptionEnabled() {
+        return mAccessibilityDescriptionEnabled;
     }
 
     public int getDividerColor() {

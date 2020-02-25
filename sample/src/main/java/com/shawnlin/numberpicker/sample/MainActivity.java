@@ -77,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
         // Set wrap selector wheel
         numberPicker.setWrapSelectorWheel(true);
 
+        // Set accessibility description enabled
+        numberPicker.setAccessibilityDescriptionEnabled(true);
+
         // OnClickListener
         numberPicker.setOnClickListener(new View.OnClickListener() {
             @Override

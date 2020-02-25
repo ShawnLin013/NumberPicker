@@ -75,6 +75,9 @@ numberPicker.setScrollerEnabled(true);
 // Set wrap selector wheel
 numberPicker.setWrapSelectorWheel(true);
 
+// Set accessibility description enabled
+numberPicker.setAccessibilityDescriptionEnabled(true);
+        
 // OnClickListener
 numberPicker.setOnClickListener(new View.OnClickListener() {
     @Override
@@ -122,6 +125,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |:---:|:---:|
 |np_width|The width of this widget.|
 |np_height|The height of this widget.|
+|np_accessibilityDescriptionEnabled|Flag whether the accessibility description enabled. Default is enabled.|
 |np_dividerColor|The color of the selection divider.|
 |np_dividerDistance|The distance between the two selection dividers.|
 |np_dividerThickness|The thickness of the selection divider.|
