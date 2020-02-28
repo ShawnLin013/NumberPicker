@@ -1231,7 +1231,7 @@ public class NumberPicker extends LinearLayout {
         }
         int[] selectorIndices = getSelectorIndices();
         int startScrollOffset = mCurrentScrollOffset;
-        int gap;
+        int gap = (int) getMaxTextSize();
         if (isHorizontalMode()) {
             if (isAscendingOrder()) {
                 if (!mWrapSelectorWheel && x > 0
@@ -1258,7 +1258,6 @@ public class NumberPicker extends LinearLayout {
             }
 
             mCurrentScrollOffset += x;
-            gap = mSelectorTextGapWidth;
         } else {
             if (isAscendingOrder()) {
                 if (!mWrapSelectorWheel && y > 0
@@ -1285,7 +1284,6 @@ public class NumberPicker extends LinearLayout {
             }
 
             mCurrentScrollOffset += y;
-            gap = mSelectorTextGapHeight;
         }
 
         while (mCurrentScrollOffset - mInitialScrollOffset > gap) {
@@ -2047,21 +2045,18 @@ public class NumberPicker extends LinearLayout {
     private void initializeSelectorWheel() {
         initializeSelectorWheelIndices();
         int[] selectorIndices = getSelectorIndices();
-        int totalTextSize = (selectorIndices.length - 1) * (int) mTextSize
-                + (int) mSelectedTextSize;
+        int totalTextSize = (int) ((selectorIndices.length - 1) * mTextSize + mSelectedTextSize);
         float textGapCount = selectorIndices.length;
         if (isHorizontalMode()) {
             float totalTextGapWidth = (getRight() - getLeft()) - totalTextSize;
             mSelectorTextGapWidth = (int) (totalTextGapWidth / textGapCount);
             mSelectorElementSize = (int) getMaxTextSize() + mSelectorTextGapWidth;
-            mInitialScrollOffset = (int) mSelectedTextCenterX
-                    - (mSelectorElementSize * mWheelMiddleItemIndex);
+            mInitialScrollOffset = (int) (mSelectedTextCenterX - mSelectorElementSize * mWheelMiddleItemIndex);
         } else {
             float totalTextGapHeight = (getBottom() - getTop()) - totalTextSize;
             mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount);
             mSelectorElementSize = (int) getMaxTextSize() + mSelectorTextGapHeight;
-            mInitialScrollOffset = (int) mSelectedTextCenterY
-                    - (mSelectorElementSize * mWheelMiddleItemIndex);
+            mInitialScrollOffset = (int) (mSelectedTextCenterY - mSelectorElementSize * mWheelMiddleItemIndex);
         }
         mCurrentScrollOffset = mInitialScrollOffset;
         updateInputTextView();
