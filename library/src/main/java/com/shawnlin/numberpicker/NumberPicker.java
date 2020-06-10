@@ -119,6 +119,11 @@ public class NumberPicker extends LinearLayout {
     private static final int DEFAULT_DIVIDER_COLOR = 0xFF000000;
 
     /**
+     * The default divider type.
+     */
+    private static final DividerType DEFAULT_DIVIDER_TYPE = DividerType.SIDE_LINES;
+
+    /**
      * The default max value of this widget.
      */
     private static final int DEFAULT_MAX_VALUE = 100;
@@ -535,6 +540,19 @@ public class NumberPicker extends LinearLayout {
     private int mRightDividerRight;
 
     /**
+     * The enum of divider types.
+     */
+    private enum DividerType {
+        SIDE_LINES,
+        UNDERLINE,
+    }
+
+    /**
+     * The type of the divider.
+     */
+    private DividerType mDividerType;
+
+    /**
      * The current scroll state of the number picker.
      */
     private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
@@ -736,6 +754,8 @@ public class NumberPicker extends LinearLayout {
                 R.styleable.NumberPicker_np_dividerDistance, defDividerDistance);
         mDividerThickness = attributes.getDimensionPixelSize(
                 R.styleable.NumberPicker_np_dividerThickness, defDividerThickness);
+        mDividerType = DividerType.values()[attributes.getInt(
+                R.styleable.NumberPicker_np_dividerType, DEFAULT_DIVIDER_TYPE.ordinal())];
 
         mOrder = attributes.getInt(R.styleable.NumberPicker_np_order, ASCENDING);
         mOrientation = attributes.getInt(R.styleable.NumberPicker_np_orientation, VERTICAL);
@@ -901,6 +921,7 @@ public class NumberPicker extends LinearLayout {
             if (isHorizontalMode()) {
                 mLeftDividerLeft = (getWidth() - mDividerDistance) / 2 - mDividerThickness;
                 mRightDividerRight = mLeftDividerLeft + dividerDistance;
+                mBottomDividerBottom = getHeight();
             } else {
                 mTopDividerTop = (getHeight() - mDividerDistance) / 2 - mDividerThickness;
                 mBottomDividerBottom = mTopDividerTop + dividerDistance;
@@ -1807,35 +1828,72 @@ public class NumberPicker extends LinearLayout {
 
         // draw the dividers
         if (showSelectorWheel && mDividerDrawable != null) {
-            if (isHorizontalMode()) {
-                final int bottom = getBottom();
+            if (isHorizontalMode())
+                drawHorizontalDividers(canvas);
+            else
+                drawVerticalDividers(canvas);
+        }
+    }
 
+    private void drawHorizontalDividers(Canvas canvas) {
+        switch (mDividerType) {
+            case SIDE_LINES:
+                final int bottom = getBottom();
                 // draw the left divider
                 final int leftOfLeftDivider = mLeftDividerLeft;
                 final int rightOfLeftDivider = leftOfLeftDivider + mDividerThickness;
                 mDividerDrawable.setBounds(leftOfLeftDivider, 0, rightOfLeftDivider, bottom);
                 mDividerDrawable.draw(canvas);
-
                 // draw the right divider
                 final int rightOfRightDivider = mRightDividerRight;
                 final int leftOfRightDivider = rightOfRightDivider - mDividerThickness;
                 mDividerDrawable.setBounds(leftOfRightDivider, 0, rightOfRightDivider, bottom);
                 mDividerDrawable.draw(canvas);
-            } else {
-                final int right = getRight();
+                break;
+            case UNDERLINE:
+                final int leftOfUnderlineDivider = mLeftDividerLeft;
+                final int rightOfUnderlineDivider = mRightDividerRight;
+                final int bottomOfUnderlineDivider = mBottomDividerBottom;
+                final int topOfUnderlineDivider = bottomOfUnderlineDivider - mDividerThickness;
+                mDividerDrawable.setBounds(
+                    leftOfUnderlineDivider,
+                    topOfUnderlineDivider,
+                    rightOfUnderlineDivider,
+                    bottomOfUnderlineDivider
+                );
+                mDividerDrawable.draw(canvas);
+                break;
+        }
+    }
 
+    private void drawVerticalDividers(Canvas canvas) {
+        switch (mDividerType) {
+            case SIDE_LINES:
+                final int right = getRight();
                 // draw the top divider
                 final int topOfTopDivider = mTopDividerTop;
                 final int bottomOfTopDivider = topOfTopDivider + mDividerThickness;
                 mDividerDrawable.setBounds(0, topOfTopDivider, right, bottomOfTopDivider);
                 mDividerDrawable.draw(canvas);
-
                 // draw the bottom divider
                 final int bottomOfBottomDivider = mBottomDividerBottom;
                 final int topOfBottomDivider = bottomOfBottomDivider - mDividerThickness;
                 mDividerDrawable.setBounds(0, topOfBottomDivider, right, bottomOfBottomDivider);
                 mDividerDrawable.draw(canvas);
-            }
+                break;
+            case UNDERLINE:
+                final int leftOfUnderlineDivider = 0;
+                final int rightOfUnderlineDivider = getRight();
+                final int bottomOfUnderlineDivider = mBottomDividerBottom;
+                final int topOfUnderlineDivider = bottomOfUnderlineDivider - mDividerThickness;
+                mDividerDrawable.setBounds(
+                    leftOfUnderlineDivider,
+                    topOfUnderlineDivider,
+                    rightOfUnderlineDivider,
+                    bottomOfUnderlineDivider
+                );
+                mDividerDrawable.draw(canvas);
+                break;
         }
     }
 
