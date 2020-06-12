@@ -138,14 +138,15 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 
 ### Attributes
 
-|attribute name|attribute description|
-|:---:|:---:|
+|attribute name|attribute description|defalut|
+|:---:|:---:|:---:|
 |np_width|The width of this widget.|
 |np_height|The height of this widget.|
-|np_accessibilityDescriptionEnabled|Flag whether the accessibility description enabled. Default is enabled.|
+|np_accessibilityDescriptionEnabled|Flag whether the accessibility description enabled.|enabled|
 |np_dividerColor|The color of the selection divider.|
 |np_dividerDistance|The distance between the two selection dividers.|
 |np_dividerThickness|The thickness of the selection divider.|
+|np_dividerType|The type of the selection divider.|side_lines|
 |np_fadingEdgeEnabled|Flag whether the fading edge should enabled.|
 |np_fadingEdgeStrength|The strength of fading edge while drawing the selector.|
 |np_formatter|The formatter of the numbers.|
@@ -154,16 +155,16 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_max|The max value of this widget.|
 |np_maxFlingVelocityCoefficient|The coefficient to adjust (divide) the max fling velocity.|
 |np_min|The min value of this widget.|
-|np_order|The order of this widget. Default is ascending.|
-|np_orientation|The orientation of this widget. Default is vertical.|
+|np_order|The order of this widget.|ascending|
+|np_orientation|The orientation of this widget.|vertical|
 |np_scrollerEnabled|Flag whether the scroller should enabled.|
-|np_selectedTextAlign|The text align of the selected number. Default is center.|
+|np_selectedTextAlign|The text align of the selected number.|center|
 |np_selectedTextColor|The text color of the selected number.|
 |np_selectedTextSize|The text size of the selected number.|
 |np_selectedTextStrikeThru|Flag whether the selected text should strikethroughed.|
 |np_selectedTextUnderline|Flag whether the selected text should underlined.|
 |np_selectedTypeface|The typeface of the selected numbers.|
-|np_textAlign|The text align of the numbers. Default is center.|
+|np_textAlign|The text align of the numbers.|center|
 |np_textColor|The text color of the numbers.|
 |np_textSize|The text size of the numbers.|
 |np_textStrikeThru|Flag whether the text should strikethroughed.|
