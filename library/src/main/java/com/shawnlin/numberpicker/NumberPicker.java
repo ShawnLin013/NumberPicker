@@ -30,6 +30,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -37,12 +43,6 @@ import androidx.annotation.DimenRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -1752,12 +1752,14 @@ public class NumberPicker extends LinearLayout {
                 mSelectorWheelPaint.setColor(mSelectedTextColor);
                 mSelectorWheelPaint.setStrikeThruText(mSelectedTextStrikeThru);
                 mSelectorWheelPaint.setUnderlineText(mSelectedTextUnderline);
+                mSelectorWheelPaint.setTypeface(mSelectedTypeface);
             } else {
                 mSelectorWheelPaint.setTextAlign(Paint.Align.values()[mTextAlign]);
                 mSelectorWheelPaint.setTextSize(mTextSize);
                 mSelectorWheelPaint.setColor(mTextColor);
                 mSelectorWheelPaint.setStrikeThruText(mTextStrikeThru);
                 mSelectorWheelPaint.setUnderlineText(mTextUnderline);
+                mSelectorWheelPaint.setTypeface(mTypeface);
             }
 
             int selectorIndex = selectorIndices[isAscendingOrder()
