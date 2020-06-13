@@ -10,7 +10,7 @@ It's based on [android.widget.NumberPicker](https://android.googlesource.com/pla
 ## Features
 
 - Customizable fonts(color, size, strikethrough, underline, typeface)
-- Customizable dividers(color, distance, thickness)
+- Customizable dividers(color, distance, length, thickness, type)
 - Horizontal and Vertical mode are both supported
 - Ascending and Descending order are both supported
 - Also supports negative values and multiple lines
@@ -145,6 +145,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_accessibilityDescriptionEnabled|Flag whether the accessibility description enabled.|enabled|
 |np_dividerColor|The color of the selection divider.|
 |np_dividerDistance|The distance between the two selection dividers.|
+|np_dividerLength|The length of the selection divider.|
 |np_dividerThickness|The thickness of the selection divider.|
 |np_dividerType|The type of the selection divider.|side_lines|
 |np_fadingEdgeEnabled|Flag whether the fading edge should enabled.|
