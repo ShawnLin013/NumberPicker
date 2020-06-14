@@ -2160,8 +2160,10 @@ public class NumberPicker extends LinearLayout {
     private void initializeFadingEdges() {
         if (isHorizontalMode()) {
             setHorizontalFadingEdgeEnabled(true);
+            setVerticalFadingEdgeEnabled(false);
             setFadingEdgeLength((getRight() - getLeft() - (int) mTextSize) / 2);
         } else {
+            setHorizontalFadingEdgeEnabled(false);
             setVerticalFadingEdgeEnabled(true);
             setFadingEdgeLength((getBottom() - getTop() - (int) mTextSize) / 2);
         }
@@ -2689,6 +2691,7 @@ public class NumberPicker extends LinearLayout {
     public void setOrientation(@Orientation int orientation) {
         mOrientation = orientation;
         setWidthAndHeight();
+        requestLayout();
     }
 
     public void setWheelItemCount(int count) {
