@@ -1263,7 +1263,7 @@ public class NumberPicker extends LinearLayout {
         }
         int[] selectorIndices = getSelectorIndices();
         int startScrollOffset = mCurrentScrollOffset;
-        int gap = (int) getMaxTextSize();
+        int gap = isHorizontalMode()?mSelectorTextGapWidth:mSelectorTextGapHeight;
         if (isHorizontalMode()) {
             if (isAscendingOrder()) {
                 if (!mWrapSelectorWheel && x > 0
