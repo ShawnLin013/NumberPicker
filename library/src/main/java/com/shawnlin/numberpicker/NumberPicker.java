@@ -76,6 +76,14 @@ public class NumberPicker extends LinearLayout {
     public static final int CENTER = 1;
     public static final int LEFT = 2;
 
+    @Retention(SOURCE)
+    @IntDef({SIDE_LINES, UNDERLINE})
+    public @interface DividerType {
+    }
+
+    public static final int SIDE_LINES = 0;
+    public static final int UNDERLINE = 1;
+
     /**
      * The default update interval during long press.
      */
@@ -120,11 +128,6 @@ public class NumberPicker extends LinearLayout {
      * The default color of divider.
      */
     private static final int DEFAULT_DIVIDER_COLOR = 0xFF000000;
-
-    /**
-     * The default divider type.
-     */
-    private static final DividerType DEFAULT_DIVIDER_TYPE = DividerType.SIDE_LINES;
 
     /**
      * The default max value of this widget.
@@ -548,17 +551,9 @@ public class NumberPicker extends LinearLayout {
     private int mRightDividerRight;
 
     /**
-     * The enum of divider types.
-     */
-    private enum DividerType {
-        SIDE_LINES,
-        UNDERLINE,
-    }
-
-    /**
      * The type of the divider.
      */
-    private DividerType mDividerType;
+    private int mDividerType;
 
     /**
      * The current scroll state of the number picker.
@@ -755,8 +750,7 @@ public class NumberPicker extends LinearLayout {
                 R.styleable.NumberPicker_np_dividerLength, 0);
         mDividerThickness = attributes.getDimensionPixelSize(
                 R.styleable.NumberPicker_np_dividerThickness, defDividerThickness);
-        mDividerType = DividerType.values()[attributes.getInt(
-                R.styleable.NumberPicker_np_dividerType, DEFAULT_DIVIDER_TYPE.ordinal())];
+        mDividerType = attributes.getInt(R.styleable.NumberPicker_np_dividerType, SIDE_LINES);
 
         mOrder = attributes.getInt(R.styleable.NumberPicker_np_order, ASCENDING);
         mOrientation = attributes.getInt(R.styleable.NumberPicker_np_orientation, VERTICAL);
@@ -2668,6 +2662,11 @@ public class NumberPicker extends LinearLayout {
 
     public void setDividerDistanceResource(@DimenRes int dimenId) {
         setDividerDistance(getResources().getDimensionPixelSize(dimenId));
+    }
+
+    public void setDividerType(@DividerType int dividerType) {
+        mDividerType = dividerType;
+        invalidate();
     }
 
     public void setDividerThickness(int thickness) {
