@@ -160,6 +160,11 @@ public class NumberPicker extends LinearLayout {
     private static final int DEFAULT_TEXT_ALIGN = CENTER;
 
     /**
+     * The default content alignment.
+     */
+    private static final int DEFAULT_ALIGN = CENTER;
+
+    /**
      * The default color of text.
      */
     private static final int DEFAULT_TEXT_COLOR = 0xFF000000;
@@ -626,6 +631,16 @@ public class NumberPicker extends LinearLayout {
     private ViewConfiguration mViewConfiguration;
 
     /**
+     * The content alignment.
+     */
+    private int mAlign = DEFAULT_ALIGN;
+
+    /**
+     * The padding applied to the content when it's not centered (align is "left" or "right").
+     */
+    private int mSidePadding = 0;
+
+    /**
      * Interface to listen for changes of the current value.
      */
     public interface OnValueChangeListener {
@@ -808,6 +823,9 @@ public class NumberPicker extends LinearLayout {
                 R.styleable.NumberPicker_np_hideWheelUntilFocused, false);
         mAccessibilityDescriptionEnabled = attributes.getBoolean(
                 R.styleable.NumberPicker_np_accessibilityDescriptionEnabled, true);
+        mAlign = attributes.getInt(R.styleable.NumberPicker_np_align, mAlign);
+        mSidePadding = attributes.getDimensionPixelSize(
+                R.styleable.NumberPicker_np_sidePadding, mSidePadding);
 
         // By default LinearLayout that we extend is not drawn. This is
         // its draw() method is not called but dispatchDraw() is called
@@ -1761,7 +1779,14 @@ public class NumberPicker extends LinearLayout {
                 canvas.clipRect(mLeftDividerLeft, 0, mRightDividerRight, getBottom());
             }
         } else {
-            x = (getRight() - getLeft()) / 2f;
+            if (mAlign == LEFT) {
+                x = getLeft() + mSidePadding;
+            } else if (mAlign == RIGHT) {
+                x = getRight() - getMaxTextSize() - mSidePadding;
+            } else {
+                x = (getRight() - getLeft()) / 2f;
+            }
+
             y = mCurrentScrollOffset;
             if (mRealWheelItemCount < DEFAULT_WHEEL_ITEM_COUNT) {
                 canvas.clipRect(0, mTopDividerTop, getRight(), mBottomDividerBottom);

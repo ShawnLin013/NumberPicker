@@ -56,5 +56,11 @@
         <attr name="np_value" format="integer" />
         <attr name="np_wheelItemCount" format="integer" />
         <attr name="np_wrapSelectorWheel" format="boolean" />
+        <attr name="np_align" format="enum">
+            <enum name="right" value="0" />
+            <enum name="center" value="1" />
+            <enum name="left" value="2" />
+        </attr>
+        <attr name="np_sidePadding" format="dimension" />
     </declare-styleable>
 </resources>
