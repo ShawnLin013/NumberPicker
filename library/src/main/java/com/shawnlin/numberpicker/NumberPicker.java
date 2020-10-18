@@ -778,8 +778,16 @@ public class NumberPicker extends LinearLayout {
                 R.styleable.NumberPicker_np_selectedTextStrikeThru, mSelectedTextStrikeThru);
         mSelectedTextUnderline = attributes.getBoolean(
                 R.styleable.NumberPicker_np_selectedTextUnderline, mSelectedTextUnderline);
-        mSelectedTypeface = Typeface.create(attributes.getString(
-                R.styleable.NumberPicker_np_selectedTypeface), Typeface.NORMAL);
+
+        if (attributes.getString(R.styleable.NumberPicker_np_selectedTypeface) != null)
+            try {
+                mSelectedTypeface = Typeface.createFromAsset(mContext.getAssets(), attributes.getString(R.styleable.NumberPicker_np_typeface));
+            } catch (Exception e) {
+                mSelectedTypeface = Typeface.create(attributes.getString(R.styleable.NumberPicker_np_typeface),Typeface.NORMAL);
+            }
+
+
+
         mTextAlign = attributes.getInt(R.styleable.NumberPicker_np_textAlign, mTextAlign);
         mTextColor = attributes.getColor(R.styleable.NumberPicker_np_textColor, mTextColor);
         mTextSize = attributes.getDimension(R.styleable.NumberPicker_np_textSize,
@@ -788,8 +796,16 @@ public class NumberPicker extends LinearLayout {
                 R.styleable.NumberPicker_np_textStrikeThru, mTextStrikeThru);
         mTextUnderline = attributes.getBoolean(
                 R.styleable.NumberPicker_np_textUnderline, mTextUnderline);
-        mTypeface = Typeface.create(attributes.getString(R.styleable.NumberPicker_np_typeface),
-                Typeface.NORMAL);
+
+        if (attributes.getString(R.styleable.NumberPicker_np_typeface) != null) {
+            try {
+                mTypeface = Typeface.createFromAsset(mContext.getAssets(), attributes.getString(R.styleable.NumberPicker_np_typeface));
+            } catch (Exception e) {
+                mTypeface = Typeface.create(attributes.getString(R.styleable.NumberPicker_np_typeface),Typeface.NORMAL);
+            }
+        }
+
+
         mFormatter = stringToFormatter(attributes.getString(R.styleable.NumberPicker_np_formatter));
         mFadingEdgeEnabled = attributes.getBoolean(R.styleable.NumberPicker_np_fadingEdgeEnabled,
                 mFadingEdgeEnabled);
@@ -2772,19 +2788,38 @@ public class NumberPicker extends LinearLayout {
         if (TextUtils.isEmpty(string)) {
             return;
         }
-        setSelectedTypeface(Typeface.create(string, style));
+        if (string != null)
+            try {
+                setSelectedTypeface(Typeface.createFromAsset(mContext.getAssets(), string));
+            }catch (Exception e){
+                setSelectedTypeface(Typeface.create(string,Typeface.NORMAL));
+            }
+
     }
 
     public void setSelectedTypeface(String string) {
-        setSelectedTypeface(string, Typeface.NORMAL);
+        if (string != null)
+            try {
+                setSelectedTypeface(Typeface.createFromAsset(mContext.getAssets(), string));
+            }catch (Exception e){
+                setSelectedTypeface(Typeface.create(string,Typeface.NORMAL));
+            }
     }
 
     public void setSelectedTypeface(@StringRes int stringId, int style) {
-        setSelectedTypeface(getResources().getString(stringId), style);
+        try {
+            setSelectedTypeface(Typeface.createFromAsset(mContext.getAssets(), getResources().getString(stringId)));
+        }catch (Exception e){
+            setSelectedTypeface(Typeface.create(getResources().getString(stringId),Typeface.NORMAL));
+        }
     }
 
     public void setSelectedTypeface(@StringRes int stringId) {
-        setSelectedTypeface(stringId, Typeface.NORMAL);
+        try {
+            setSelectedTypeface(Typeface.createFromAsset(mContext.getAssets(), getResources().getString(stringId)));
+        }catch (Exception e){
+            setSelectedTypeface(Typeface.create(getResources().getString(stringId),Typeface.NORMAL));
+        }
     }
 
     public void setTextAlign(@Align int align) {
@@ -2831,7 +2866,13 @@ public class NumberPicker extends LinearLayout {
         if (TextUtils.isEmpty(string)) {
             return;
         }
-        setTypeface(Typeface.create(string, style));
+        if (string != null) {
+            try {
+                setTypeface((Typeface.createFromAsset(mContext.getAssets(), string)));
+            } catch (Exception e) {
+                setTypeface((Typeface.create(string,Typeface.NORMAL)));
+            }
+        }
     }
 
     public void setTypeface(String string) {

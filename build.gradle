@@ -4,6 +4,15 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
+        maven{
+            url "https://dl.bintray.com/infideap2/Drawer-Behavior"
+        }
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.2'
@@ -15,8 +24,11 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
+        maven { url "https://maven.google.com" }
+        mavenLocal()
         jcenter()
+        maven { url "https://jitpack.io" }
+        google()
     }
 }
 
