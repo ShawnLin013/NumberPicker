@@ -641,6 +641,11 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
+     * The amount of space between items.
+     */
+    private int mItemSpacing = 0;
+
+    /**
      * Interface to listen for the picker scroll state.
      */
     public interface OnScrollListener {
@@ -808,7 +813,8 @@ public class NumberPicker extends LinearLayout {
                 R.styleable.NumberPicker_np_hideWheelUntilFocused, false);
         mAccessibilityDescriptionEnabled = attributes.getBoolean(
                 R.styleable.NumberPicker_np_accessibilityDescriptionEnabled, true);
-
+        mItemSpacing = attributes.getDimensionPixelSize(
+                R.styleable.NumberPicker_np_itemSpacing, 0);
         // By default LinearLayout that we extend is not drawn. This is
         // its draw() method is not called but dispatchDraw() is called
         // directly (see ViewGroup.drawChild()). However, this class uses
@@ -1804,7 +1810,27 @@ public class NumberPicker extends LinearLayout {
                 if (!isHorizontalMode()) {
                     textY += getPaintCenterY(mSelectorWheelPaint.getFontMetrics());
                 }
-                drawText(scrollSelectorValue, x, textY, mSelectorWheelPaint, canvas);
+
+                int xOffset = 0;
+                int yOffset = 0;
+
+                if (i != mWheelMiddleItemIndex && mItemSpacing != 0) {
+                    if (isHorizontalMode()) {
+                        if (i > mWheelMiddleItemIndex) {
+                            xOffset = mItemSpacing;
+                        } else {
+                            xOffset = -mItemSpacing;
+                        }
+                    } else {
+                        if (i > mWheelMiddleItemIndex) {
+                            yOffset = mItemSpacing;
+                        } else {
+                            yOffset = -mItemSpacing;
+                        }
+                    }
+                }
+
+                drawText(scrollSelectorValue, x + xOffset, textY + yOffset, mSelectorWheelPaint, canvas);
             }
 
             if (isHorizontalMode()) {
@@ -2854,6 +2880,10 @@ public class NumberPicker extends LinearLayout {
         mMaxFlingVelocityCoefficient = coefficient;
         mMaximumFlingVelocity = mViewConfiguration.getScaledMaximumFlingVelocity()
                 / mMaxFlingVelocityCoefficient;
+    }
+
+    public void setItemSpacing(int itemSpacing) {
+        mItemSpacing = itemSpacing;
     }
 
     public boolean isHorizontalMode() {
