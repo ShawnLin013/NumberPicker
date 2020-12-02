@@ -1814,7 +1814,7 @@ public class NumberPicker extends LinearLayout {
                 int xOffset = 0;
                 int yOffset = 0;
 
-                if (i != mWheelMiddleItemIndex) {
+                if (i != mWheelMiddleItemIndex && mItemSpacing != 0) {
                     if (isHorizontalMode()) {
                         if (i > mWheelMiddleItemIndex) {
                             xOffset = mItemSpacing;
