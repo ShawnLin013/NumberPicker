@@ -1816,13 +1816,13 @@ public class NumberPicker extends LinearLayout {
 
                 if (i != mWheelMiddleItemIndex) {
                     if (isHorizontalMode()) {
-                        if (i > mWheelMiddleItemIndex){
+                        if (i > mWheelMiddleItemIndex) {
                             xOffset = mItemSpacing;
                         } else {
                             xOffset = -mItemSpacing;
                         }
                     } else {
-                        if (i > mWheelMiddleItemIndex){
+                        if (i > mWheelMiddleItemIndex) {
                             yOffset = mItemSpacing;
                         } else {
                             yOffset = -mItemSpacing;

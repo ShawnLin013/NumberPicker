@@ -20,6 +20,7 @@
         <attr name="np_fadingEdgeStrength" format="float" />
         <attr name="np_formatter" format="string" />
         <attr name="np_hideWheelUntilFocused" format="boolean" />
+        <attr name="np_itemSpacing" format="dimension" />
         <attr name="np_lineSpacingMultiplier" format="float" />
         <attr name="np_max" format="integer" />
         <attr name="np_maxFlingVelocityCoefficient" format="integer" />
@@ -56,6 +57,5 @@
         <attr name="np_value" format="integer" />
         <attr name="np_wheelItemCount" format="integer" />
         <attr name="np_wrapSelectorWheel" format="boolean" />
-        <attr name="np_itemSpacing" format="dimension" />
     </declare-styleable>
 </resources>

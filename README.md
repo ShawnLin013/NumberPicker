@@ -152,7 +152,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_fadingEdgeStrength|The strength of fading edge while drawing the selector.|
 |np_formatter|The formatter of the numbers.|
 |np_hideWheelUntilFocused|Flag whether the selector wheel should hidden until the picker has focus.|
-|mItemSpacing|Amount of space between items.|
+|np_itemSpacing|Amount of space between items.|
 |np_lineSpacingMultiplier|The line spacing multiplier for the multiple lines.|
 |np_max|The max value of this widget.|
 |np_maxFlingVelocityCoefficient|The coefficient to adjust (divide) the max fling velocity.|
