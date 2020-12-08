@@ -1627,7 +1627,8 @@ public class NumberPicker extends LinearLayout {
         if (mMinValue > mValue) {
             mValue = mMinValue;
         }
-        setWrapSelectorWheel(isWrappingAllowed() && mWrapSelectorWheelPreferred);
+
+        updateWrapSelectorWheel();
         initializeSelectorWheelIndices();
         updateInputTextView();
         tryComputeMaxWidth();
