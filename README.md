@@ -188,7 +188,7 @@ buildscript {
 }
 
 dependencies {
-    implementation 'com.shawnlin:number-picker:2.4.11'
+    implementation 'com.shawnlin:number-picker:2.4.12'
 }
 ```
 
