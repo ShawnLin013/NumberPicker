@@ -3,7 +3,8 @@
 The android library that provides a simple and customizable NumberPicker.
 It's based on [android.widget.NumberPicker](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/widget/NumberPicker.java).
 
-[![Platform](http://img.shields.io/badge/platform-android-brightgreen.svg?style=flat)](http://developer.android.com/index.html) [![Language](http://img.shields.io/badge/language-java-orange.svg?style=flat)](http://www.oracle.com/technetwork/java/javase/downloads/index.html) [![](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-NumberPicker-green.svg?style=true)](https://android-arsenal.com/details/1/3718) [![API](https://img.shields.io/badge/API-15%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=15) [![Download](https://api.bintray.com/packages/shawnlin013/maven/number-picker/images/download.svg)](https://bintray.com/shawnlin013/maven/number-picker/_latestVersion) [![CircleCI](https://circleci.com/gh/ShawnLin013/NumberPicker.svg?style=svg)](https://circleci.com/gh/ShawnLin013/NumberPicker)
+[![Platform](http://img.shields.io/badge/platform-android-brightgreen.svg?style=flat)](http://developer.android.com/index.html) [![Language](http://img.shields.io/badge/language-java-orange.svg?style=flat)](http://www.oracle.com/technetwork/java/javase/downloads/index.html) [![](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-NumberPicker-green.svg?style=true)](https://android-arsenal.com/details/1/3718) [![API](https://img.shields.io/badge/API-15%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=15) ![Maven Central](https://img.shields.io/maven-central/v/io.github.ShawnLin013/number-picker) [![CircleCI](https://circleci.com/gh/ShawnLin013/NumberPicker.svg?style=svg)](https://circleci.com/gh/ShawnLin013/NumberPicker)
+[![GitHub stars](https://img.shields.io/github/stars/ShawnLin013/NumberPicker)](https://github.com/ShawnLin013/NumberPicker/stargazers) [![GitHub forks](https://img.shields.io/github/forks/ShawnLin013/NumberPicker)](https://github.com/ShawnLin013/NumberPicker/network)
 
 <img src="https://github.com/ShawnLin013/NumberPicker/blob/master/screenshot/number-picker-theme.png">
 
@@ -138,7 +139,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 
 ### Attributes
 
-|attribute name|attribute description|defalut|
+|attribute name|attribute description|default|
 |:---:|:---:|:---:|
 |np_width|The width of this widget.|
 |np_height|The height of this widget.|
@@ -183,12 +184,12 @@ Add the dependency in your `build.gradle`
 ```gradle
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
 dependencies {
-    implementation 'com.shawnlin:number-picker:2.4.12'
+    implementation 'io.github.ShawnLin013:number-picker:2.4.13'
 }
 ```
 
