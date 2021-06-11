@@ -1110,11 +1110,9 @@ public class NumberPicker extends LinearLayout {
                         int eventX = (int) event.getX();
                         int deltaMoveX = (int) Math.abs(eventX - mLastDownEventX);
                         if (deltaMoveX <= mTouchSlop) {
-                            int selectorIndexOffset = (eventX / mSelectorElementSize)
-                                    - mWheelMiddleItemIndex;
-                            if (selectorIndexOffset > 0) {
+                            if (eventX > mRightDividerRight) {
                                 changeValueByOne(true);
-                            } else if (selectorIndexOffset < 0) {
+                            } else if (eventX < mLeftDividerLeft) {
                                 changeValueByOne(false);
                             } else {
                                 ensureScrollWheelAdjusted();
@@ -1133,11 +1131,9 @@ public class NumberPicker extends LinearLayout {
                         int eventY = (int) event.getY();
                         int deltaMoveY = (int) Math.abs(eventY - mLastDownEventY);
                         if (deltaMoveY <= mTouchSlop) {
-                            int selectorIndexOffset = (eventY / mSelectorElementSize)
-                                    - mWheelMiddleItemIndex;
-                            if (selectorIndexOffset > 0) {
+                            if (eventY > mBottomDividerBottom) {
                                 changeValueByOne(true);
-                            } else if (selectorIndexOffset < 0) {
+                            } else if (eventY < mTopDividerTop) {
                                 changeValueByOne(false);
                             } else {
                                 ensureScrollWheelAdjusted();
