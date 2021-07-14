@@ -11,6 +11,7 @@
         <attr name="np_dividerType" format="enum">
             <enum name="side_lines" value="0" />
             <enum name="underline" value="1" />
+            <enum name="drawable_as_divider" value="2" />
         </attr>
         <attr name="np_dividerColor" format="color" />
         <attr name="np_dividerDistance" format="dimension" />

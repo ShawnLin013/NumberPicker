@@ -25,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         final NumberPicker numberPicker = findViewById(R.id.number_picker);
+        final NumberPicker numberPickerDrawableDividerVertical = findViewById(R.id.number_picker_drawable_divider_vertical);
+        final NumberPicker numberPickerDrawableDividerHorizontal = findViewById(R.id.number_picker_drawable_divider_horizontal);
+
 
         // Set divider color
         numberPicker.setDividerColor(ContextCompat.getColor(this, R.color.colorPrimary));
@@ -112,6 +115,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Set drawable as divider
+        numberPickerDrawableDividerVertical.setDividerDrawableResource(R.drawable.blue_rectangle);
+        numberPickerDrawableDividerHorizontal.setDividerDrawableResource(R.drawable.accent_rectangle);
     }
 
 }
