@@ -77,12 +77,18 @@ public class NumberPicker extends LinearLayout {
     public static final int LEFT = 2;
 
     @Retention(SOURCE)
-    @IntDef({SIDE_LINES, UNDERLINE})
+    @IntDef({SIDE_LINES, UNDERLINE, DRAWABLE_AS_DIVIDER})
     public @interface DividerType {
     }
 
     public static final int SIDE_LINES = 0;
     public static final int UNDERLINE = 1;
+    public static final int DRAWABLE_AS_DIVIDER = 2;
+
+    /**
+     * The default drawable resource ID for drawable divider.
+     */
+    public static final int DEFAULT_DRAWABLE_DIVIDER_RES = 0;
 
     /**
      * The default update interval during long press.
@@ -128,6 +134,11 @@ public class NumberPicker extends LinearLayout {
      * The default color of divider.
      */
     private static final int DEFAULT_DIVIDER_COLOR = 0xFF000000;
+
+    /**
+     * The default alpha value for the drawable divider.
+     */
+    private static final int DEFAULT_DIVIDER_DRAWABLE_ALPHA_VALUE = 100;
 
     /**
      * The default max value of this widget.
@@ -304,6 +315,16 @@ public class NumberPicker extends LinearLayout {
      * The color of the text.
      */
     private int mTextColor = DEFAULT_TEXT_COLOR;
+
+    /**
+     * The drawable divider resource.
+     */
+    private int mDividerResource = DEFAULT_DRAWABLE_DIVIDER_RES;
+
+    /**
+     * The alpha value for the drawable divider
+     */
+    private int mDividerDrawableAlphaValue = DEFAULT_DIVIDER_DRAWABLE_ALPHA_VALUE;
 
     /**
      * The size of the text.
@@ -1896,6 +1917,17 @@ public class NumberPicker extends LinearLayout {
                 );
                 mDividerDrawable.draw(canvas);
                 break;
+            case DRAWABLE_AS_DIVIDER:
+                final int drawableLeft = (getWidth() - mDividerLength)/ 2;
+                final int drawableTop = (getHeight() - mDividerThickness)/2;
+                final int drawableRight = (getWidth() + mDividerLength)/ 2;
+                final int drawableBottom = (getHeight() + mDividerThickness)/2;
+
+                mDividerDrawable = getResources().getDrawable(mDividerResource);
+                mDividerDrawable.setBounds(drawableLeft, drawableTop, drawableRight, drawableBottom);
+                mDividerDrawable.setAlpha(mDividerDrawableAlphaValue);
+                mDividerDrawable.draw(canvas);
+                break;
         }
     }
 
@@ -1935,6 +1967,16 @@ public class NumberPicker extends LinearLayout {
                         right,
                         bottomOfUnderlineDivider
                 );
+                mDividerDrawable.draw(canvas);
+                break;
+            case DRAWABLE_AS_DIVIDER:
+                final int drawableLeft = (getWidth() - mDividerLength) / 2;
+                final int drawableTop = (getHeight() - mDividerThickness) / 2;
+                final int drawableRight = (getWidth() + mDividerLength) / 2;
+                final int drawableBottom = (getHeight() + mDividerThickness) / 2;
+                mDividerDrawable = getResources().getDrawable(mDividerResource);
+                mDividerDrawable.setBounds(drawableLeft, drawableTop, drawableRight, drawableBottom);
+                mDividerDrawable.setAlpha(mDividerDrawableAlphaValue);
                 mDividerDrawable.draw(canvas);
                 break;
         }
@@ -2677,6 +2719,11 @@ public class NumberPicker extends LinearLayout {
     public void setDividerColor(@ColorInt int color) {
         mDividerColor = color;
         mDividerDrawable = new ColorDrawable(color);
+    }
+
+    public void setDividerDrawableResource(int drawableResourceId)
+    {
+        mDividerResource = drawableResourceId;
     }
 
     public void setDividerColorResource(@ColorRes int colorId) {
