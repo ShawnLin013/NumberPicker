@@ -66,6 +66,9 @@ numberPicker.setMaxValue(59);
 numberPicker.setMinValue(0);
 numberPicker.setValue(3);
 
+//Set gap size
+numberPicker.setGapSize(50);
+
 // Using string values
 // IMPORTANT! setMinValue to 1 and call setDisplayedValues after setMinValue and setMaxValue
 String[] data = {"A", "B", "C", "D", "E", "F", "G", "H", "I"};
@@ -127,6 +130,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
     app:np_height="180dp"
     app:np_dividerColor="@color/colorPrimary"
     app:np_formatter="@string/number_picker_formatter"
+    app:np_gapSize="50"
     app:np_max="59"
     app:np_min="0"
     app:np_selectedTextColor="@color/colorPrimary"
@@ -155,6 +159,7 @@ add `xmlns:app="http://schemas.android.com/apk/res-auto"`
 |np_hideWheelUntilFocused|Flag whether the selector wheel should hidden until the picker has focus.|
 |np_itemSpacing|Amount of space between items.|
 |np_lineSpacingMultiplier|The line spacing multiplier for the multiple lines.|
+|np_gapSize|The gap size of this widget.|
 |np_max|The max value of this widget.|
 |np_maxFlingVelocityCoefficient|The coefficient to adjust (divide) the max fling velocity.|
 |np_min|The min value of this widget.|
