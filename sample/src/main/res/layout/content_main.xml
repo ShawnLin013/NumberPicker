@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.shawnlin.numberpicker.sample.MainActivity"
     tools:showIn="@layout/activity_main">
@@ -24,10 +24,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        app:np_width="180dp"
-        app:np_height="64dp"
         app:np_accessibilityDescriptionEnabled="true"
         app:np_dividerColor="@color/colorAccent"
+        app:np_dividerType="underline"
+        app:np_fadingEdgeEnabled="false"
+        app:np_gapSize="50"
+        app:np_height="64dp"
         app:np_max="10"
         app:np_min="0"
         app:np_order="descending"
@@ -38,8 +40,6 @@
         app:np_textColor="@color/colorAccent"
         app:np_textSize="@dimen/text_size"
         app:np_typeface="@string/roboto_light"
-        app:np_fadingEdgeEnabled="false"
-        app:np_wrapSelectorWheel="true"
-        app:np_dividerType="underline" />
-
+        app:np_width="180dp"
+        app:np_wrapSelectorWheel="true" />
 </LinearLayout>
