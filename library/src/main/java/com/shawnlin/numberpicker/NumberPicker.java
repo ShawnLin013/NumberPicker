@@ -1,5 +1,7 @@
 package com.shawnlin.numberpicker;
 
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -43,8 +45,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * A widget that enables the user to select a number from a predefined range.
@@ -173,6 +173,11 @@ public class NumberPicker extends LinearLayout {
      * The default line spacing multiplier of text.
      */
     private static final float DEFAULT_LINE_SPACING_MULTIPLIER = 1f;
+
+    /**
+     * The default gap size.
+     */
+    private static final int DEFAULT_GAP_SIZE = 0;
 
     /**
      * Use a custom NumberPicker formatting callback to use two-digit minutes
@@ -576,6 +581,11 @@ public class NumberPicker extends LinearLayout {
     private int mOrientation;
 
     /**
+     * The gap size between items
+     */
+    private int mGapSize;
+
+    /**
      * The order of this widget.
      */
     private int mOrder;
@@ -759,6 +769,8 @@ public class NumberPicker extends LinearLayout {
 
         mOrder = attributes.getInt(R.styleable.NumberPicker_np_order, ASCENDING);
         mOrientation = attributes.getInt(R.styleable.NumberPicker_np_orientation, VERTICAL);
+
+        mGapSize = attributes.getInt(R.styleable.NumberPicker_np_gapSize, DEFAULT_GAP_SIZE);
 
         final float width = attributes.getDimensionPixelSize(R.styleable.NumberPicker_np_width,
                 SIZE_UNSPECIFIED);
@@ -1671,6 +1683,24 @@ public class NumberPicker extends LinearLayout {
     }
 
     /**
+     * Sets the gap size of the picker.
+     *
+     * @param size The gap size.
+     */
+    public void setGapSize(int size) {
+        mGapSize = size;
+    }
+
+    /**
+     * Gets the gap size of the picker.
+     *
+     * @return The gap size.
+     */
+    public int getGapSize() {
+        return mGapSize;
+    }
+
+    /**
      * Gets the values to be displayed instead of string values.
      *
      * @return The displayed values.
@@ -2165,12 +2195,12 @@ public class NumberPicker extends LinearLayout {
         float textGapCount = selectorIndices.length;
         if (isHorizontalMode()) {
             float totalTextGapWidth = (getRight() - getLeft()) - totalTextSize;
-            mSelectorTextGapWidth = (int) (totalTextGapWidth / textGapCount);
+            mSelectorTextGapWidth = (int) (totalTextGapWidth / textGapCount) + mGapSize;
             mSelectorElementSize = (int) getMaxTextSize() + mSelectorTextGapWidth;
             mInitialScrollOffset = (int) (mSelectedTextCenterX - mSelectorElementSize * mWheelMiddleItemIndex);
         } else {
             float totalTextGapHeight = (getBottom() - getTop()) - totalTextSize;
-            mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount);
+            mSelectorTextGapHeight = (int) (totalTextGapHeight / textGapCount) + mGapSize;
             mSelectorElementSize = (int) getMaxTextSize() + mSelectorTextGapHeight;
             mInitialScrollOffset = (int) (mSelectedTextCenterY - mSelectorElementSize * mWheelMiddleItemIndex);
         }

@@ -57,5 +57,6 @@
         <attr name="np_value" format="integer" />
         <attr name="np_wheelItemCount" format="integer" />
         <attr name="np_wrapSelectorWheel" format="boolean" />
+        <attr name="np_gapSize" format="integer"/>
     </declare-styleable>
 </resources>
